@@ -244,95 +244,142 @@
 
         <!-- FIELD CONTAINER 1: TRANSAKSI STANDAR (Pengeluaran, Pemasukan, Investasi, Cicilan) -->
         <div id="fields-standard" class="space-y-4 mb-4">
-          <!-- Dompet Tunggal -->
+          <!-- Dompet Tunggal (Desain Kartu & Modal Picker Elegan) -->
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label for="select-wallet" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Pilih Dompet / Sumber Dana</label>
+              <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Pilih Dompet / Sumber Dana</label>
               <span id="selected-wallet-balance-hint" class="text-[11px] font-semibold text-emerald-600">Saldo: Rp 0</span>
             </div>
-            <div class="relative">
-              <select id="select-wallet" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition appearance-none pr-8">
-                <!-- Dynamically loaded from wallets -->
-              </select>
-              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                <i class="fa-solid fa-chevron-down text-xs"></i>
+            <!-- Hidden native select for form data compatibility -->
+            <select id="select-wallet" class="hidden"></select>
+
+            <!-- Custom Interactive Trigger Button -->
+            <button type="button" id="btn-trigger-wallet-picker" class="touch-btn w-full p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/90 border border-slate-300 hover:border-emerald-400 rounded-xl flex items-center justify-between text-left transition shadow-xs group">
+              <div class="flex items-center gap-3 truncate">
+                <div id="display-wallet-logo-box" class="shrink-0 flex items-center justify-center">
+                  <!-- Rendered via JS -->
+                </div>
+                <div class="truncate">
+                  <span class="text-[10px] text-slate-400 block font-medium leading-none mb-0.5">Sumber Dana</span>
+                  <span id="display-selected-wallet-name" class="font-bold text-slate-900 text-xs sm:text-sm block truncate">Pilih Dompet</span>
+                </div>
               </div>
-            </div>
+              <div class="flex items-center gap-2 shrink-0 ml-2">
+                <span id="display-selected-wallet-badge" class="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">Rp 0</span>
+                <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition">
+                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </div>
+              </div>
+            </button>
             <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
-              <i class="fa-solid fa-info-circle text-emerald-600"></i> Saldo dompet akan otomatis berubah saat transaksi disimpan.
+              <i class="fa-solid fa-info-circle text-emerald-600"></i> Saldo dompet akan otomatis disesuaikan saat transaksi disimpan.
             </p>
           </div>
 
-          <!-- Grid Kategori & Subkategori Dinamis -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Grid Kategori & Subkategori Berdesain Kartu & Modal Picker Elegan -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Trigger Tombol Kategori Utama -->
             <div>
               <div class="flex justify-between items-center mb-1.5">
-                <label for="select-category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Kategori Utama</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Kategori Utama</label>
                 <button type="button" id="btn-quick-manage-cats" class="text-[11px] text-emerald-600 hover:text-emerald-800 font-semibold flex items-center gap-1">
                   <i class="fa-solid fa-gear text-[10px]"></i> Edit Kategori
                 </button>
               </div>
-              <div class="relative">
-                <select id="select-category" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition appearance-none pr-8">
-                  <!-- Dynamically loaded -->
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-chevron-down text-xs"></i>
+              <!-- Hidden select for form value compatibility -->
+              <select id="select-category" class="hidden"></select>
+              
+              <!-- Custom Interactive Trigger Button -->
+              <button type="button" id="btn-trigger-category-picker" class="touch-btn w-full p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/90 border border-slate-300 hover:border-emerald-400 rounded-xl flex items-center justify-between text-left transition shadow-xs group">
+                <div class="flex items-center gap-2.5 truncate">
+                  <div id="display-cat-icon-box" class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shrink-0 shadow-xs">
+                    <i class="fa-solid fa-tag"></i>
+                  </div>
+                  <div class="truncate">
+                    <span class="text-[10px] text-slate-400 block font-medium leading-none mb-0.5">Kategori</span>
+                    <span id="display-selected-category-name" class="font-bold text-slate-800 text-xs sm:text-sm block truncate">Pilih Kategori</span>
+                  </div>
                 </div>
-              </div>
+                <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition shrink-0 ml-2">
+                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </div>
+              </button>
             </div>
 
+            <!-- Trigger Tombol Subkategori -->
             <div>
               <div class="flex justify-between items-center mb-1.5">
-                <label for="select-subcategory" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Item / Subkategori</label>
-                <span class="text-[10px] text-slate-400">Otomatis terfilter</span>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Item / Subkategori</label>
+                <span class="text-[10px] text-emerald-600 font-semibold">Tersaring Otomatis</span>
               </div>
-              <div class="relative">
-                <select id="select-subcategory" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition appearance-none pr-8">
-                  <!-- Dynamically loaded -->
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-chevron-down text-xs"></i>
+              <!-- Hidden select for form value compatibility -->
+              <select id="select-subcategory" class="hidden"></select>
+
+              <!-- Custom Interactive Trigger Button -->
+              <button type="button" id="btn-trigger-subcategory-picker" class="touch-btn w-full p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/90 border border-slate-300 hover:border-emerald-400 rounded-xl flex items-center justify-between text-left transition shadow-xs group">
+                <div class="flex items-center gap-2.5 truncate">
+                  <div id="display-sub-icon-box" class="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-sm shrink-0 shadow-xs">
+                    <i class="fa-solid fa-list-check"></i>
+                  </div>
+                  <div class="truncate">
+                    <span class="text-[10px] text-slate-400 block font-medium leading-none mb-0.5">Subkategori</span>
+                    <span id="display-selected-subcategory-name" class="font-bold text-slate-800 text-xs sm:text-sm block truncate">Pilih Subkategori</span>
+                  </div>
                 </div>
-              </div>
+                <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-teal-600 transition shrink-0 ml-2">
+                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </div>
+              </button>
             </div>
           </div>
         </div>
 
         <!-- FIELD CONTAINER 2: KHUSUS TRANSFER SALDO ANTAR BANK / E-WALLET (NEW) -->
         <div id="fields-transfer" class="space-y-4 mb-4 hidden">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Dari Dompet -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Dari Dompet (Trigger Picker) -->
             <div>
               <div class="flex justify-between items-center mb-1.5">
-                <label for="select-form-transfer-from" class="block text-xs font-bold text-slate-600 uppercase tracking-wider">Dari Dompet (Sumber)</label>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider">Dari Dompet (Sumber)</label>
                 <span id="hint-form-transfer-from" class="text-[11px] font-bold text-emerald-600">Saldo: Rp 0</span>
               </div>
-              <div class="relative">
-                <select id="select-form-transfer-from" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition appearance-none pr-8">
-                  <!-- Dynamically loaded -->
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-chevron-down text-xs"></i>
+              <select id="select-form-transfer-from" class="hidden"></select>
+              
+              <button type="button" id="btn-trigger-transfer-from-picker" class="touch-btn w-full p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/90 border border-slate-300 hover:border-emerald-400 rounded-xl flex items-center justify-between text-left transition shadow-xs group">
+                <div class="flex items-center gap-2.5 truncate">
+                  <div id="display-trf-from-logo-box" class="shrink-0 flex items-center justify-center"></div>
+                  <div class="truncate">
+                    <span class="text-[10px] text-slate-400 block font-medium leading-none mb-0.5">Pengirim</span>
+                    <span id="display-selected-trf-from-name" class="font-bold text-slate-900 text-xs sm:text-sm block truncate">Pilih Dompet</span>
+                  </div>
                 </div>
-              </div>
+                <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition shrink-0 ml-2">
+                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </div>
+              </button>
               <p class="text-[10px] text-slate-500 mt-1">Saldo dompet ini akan berkurang.</p>
             </div>
 
-            <!-- Ke Dompet -->
+            <!-- Ke Dompet (Trigger Picker) -->
             <div>
               <div class="flex justify-between items-center mb-1.5">
-                <label for="select-form-transfer-to" class="block text-xs font-bold text-slate-600 uppercase tracking-wider">Ke Dompet (Tujuan)</label>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider">Ke Dompet (Tujuan)</label>
                 <span id="hint-form-transfer-to" class="text-[11px] font-bold text-emerald-600">Saldo: Rp 0</span>
               </div>
-              <div class="relative">
-                <select id="select-form-transfer-to" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition appearance-none pr-8">
-                  <!-- Dynamically loaded -->
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-chevron-down text-xs"></i>
+              <select id="select-form-transfer-to" class="hidden"></select>
+              
+              <button type="button" id="btn-trigger-transfer-to-picker" class="touch-btn w-full p-2.5 sm:p-3 bg-slate-50 hover:bg-slate-100/90 border border-slate-300 hover:border-emerald-400 rounded-xl flex items-center justify-between text-left transition shadow-xs group">
+                <div class="flex items-center gap-2.5 truncate">
+                  <div id="display-trf-to-logo-box" class="shrink-0 flex items-center justify-center"></div>
+                  <div class="truncate">
+                    <span class="text-[10px] text-slate-400 block font-medium leading-none mb-0.5">Penerima</span>
+                    <span id="display-selected-trf-to-name" class="font-bold text-slate-900 text-xs sm:text-sm block truncate">Pilih Dompet</span>
+                  </div>
                 </div>
-              </div>
+                <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition shrink-0 ml-2">
+                  <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </div>
+              </button>
               <p class="text-[10px] text-slate-500 mt-1">Saldo dompet ini akan bertambah.</p>
             </div>
           </div>
@@ -1031,6 +1078,140 @@
       <div class="flex gap-2">
         <button id="category-delete-cancel" class="touch-btn flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">Batal</button>
         <button id="category-delete-confirm" class="touch-btn flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+      <!-- ============================================== -->
+  <!-- MODAL POPUP: PICKER DOMPET & REKENING (BOTTOM SHEET / MODAL) -->
+  <!-- ============================================== -->
+  <div id="modal-wallet-picker" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white rounded-t-3xl sm:rounded-t-2xl">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shadow-xs">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base" id="picker-wallet-title">Pilih Dompet / Sumber Dana</h3>
+            <p class="text-[11px] text-slate-500" id="picker-wallet-subtitle">Pilih rekening bank, e-wallet, atau kas</p>
+          </div>
+        </div>
+        <button id="btn-close-wallet-picker" class="touch-btn w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="p-3 bg-slate-50 border-b border-slate-100">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="input-search-wallet-picker" placeholder="Cari rekening atau e-wallet (BCA, GoPay, Tunai...)" class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+      </div>
+
+      <!-- List of Wallets (Grouped by Bank, E-Wallet, Tunai, Investasi, Paylater) -->
+      <div id="picker-wallets-list" class="p-4 overflow-y-auto no-scrollbar space-y-2.5 flex-1">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Footer Info & Add Wallet Quick Button -->
+      <div class="p-3 bg-slate-50 border-t border-slate-100 text-center flex items-center justify-between px-4">
+        <span class="text-[11px] text-slate-500">Saldo terupdate otomatis</span>
+        <button id="btn-goto-add-wallet-from-modal" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-plus-circle"></i> Tambah Dompet Baru
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL POPUP: PICKER KATEGORI UTAMA (PREMIUM BOTTOM SHEET / MODAL) -->
+  <!-- ============================================== -->
+  <div id="modal-category-picker" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white rounded-t-3xl sm:rounded-t-2xl">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pilih Kategori Utama</h3>
+            <p class="text-[11px] text-slate-500" id="picker-cat-type-label">Untuk transaksi Pengeluaran</p>
+          </div>
+        </div>
+        <button id="btn-close-category-picker" class="touch-btn w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="p-3 bg-slate-50 border-b border-slate-100">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="input-search-category-picker" placeholder="Cari kategori (misal: Transportasi, Makanan...)" class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+      </div>
+
+      <!-- Grid of Categories (Visual Cards with Icons) -->
+      <div id="picker-categories-grid" class="p-4 overflow-y-auto no-scrollbar grid grid-cols-2 sm:grid-cols-2 gap-2.5 flex-1">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Footer Info -->
+      <div class="p-3 bg-slate-50 border-t border-slate-100 text-center">
+        <button id="btn-goto-manage-cats-from-modal" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold flex items-center justify-center gap-1.5 mx-auto">
+          <i class="fa-solid fa-plus-circle"></i> Tambah / Edit Kategori Baru
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL POPUP: PICKER SUBKATEGORI (PREMIUM BOTTOM SHEET / MODAL) -->
+  <!-- ============================================== -->
+  <div id="modal-subcategory-picker" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full max-h-[85vh] sm:max-h-[80vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white rounded-t-3xl sm:rounded-t-2xl">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-sm">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pilih Subkategori</h3>
+            <p class="text-[11px] text-slate-500" id="picker-sub-cat-parent-label">Di bawah kategori: Makanan</p>
+          </div>
+        </div>
+        <button id="btn-close-subcategory-picker" class="touch-btn w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="p-3 bg-slate-50 border-b border-slate-100">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" id="input-search-subcategory-picker" placeholder="Cari item / subkategori..." class="w-full pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500">
+        </div>
+      </div>
+
+      <!-- List of Subcategories (Pills / Cards) -->
+      <div id="picker-subcategories-list" class="p-4 overflow-y-auto no-scrollbar space-y-2 flex-1">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Quick Inline Add Subcategory in Modal -->
+      <div class="p-3 bg-slate-50 border-t border-slate-100 flex gap-2">
+        <input type="text" id="input-inline-modal-new-sub" placeholder="Tambah subkategori baru..." class="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500">
+        <button id="btn-inline-modal-add-sub" class="touch-btn px-3.5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition">
+          + Tambah
+        </button>
       </div>
     </div>
   </div>
@@ -1779,6 +1960,29 @@
       }
     }
 
+    
+    // --- Category Visual Icon & Styling Mapping ---
+    function getCategoryIconConfig(catName = '') {
+      const n = (catName || '').toLowerCase();
+      if (n.includes('transport')) return { icon: 'fa-car-side', bg: 'bg-blue-100 text-blue-700', border: 'border-blue-200', tagBg: 'bg-blue-50 text-blue-700' };
+      if (n.includes('makan') || n.includes('minum')) return { icon: 'fa-utensils', bg: 'bg-orange-100 text-orange-700', border: 'border-orange-200', tagBg: 'bg-orange-50 text-orange-700' };
+      if (n.includes('didik') || n.includes('sekolah') || n.includes('kursus')) return { icon: 'fa-graduation-cap', bg: 'bg-indigo-100 text-indigo-700', border: 'border-indigo-200', tagBg: 'bg-indigo-50 text-indigo-700' };
+      if (n.includes('tagihan') || n.includes('langganan') || n.includes('listrik') || n.includes('air')) return { icon: 'fa-receipt', bg: 'bg-amber-100 text-amber-800', border: 'border-amber-200', tagBg: 'bg-amber-50 text-amber-800' };
+      if (n.includes('sehat') || n.includes('life') || n.includes('obat') || n.includes('gym')) return { icon: 'fa-heart-pulse', bg: 'bg-rose-100 text-rose-700', border: 'border-rose-200', tagBg: 'bg-rose-50 text-rose-700' };
+      if (n.includes('pinjam') || n.includes('paylater') || n.includes('cicil') || n.includes('kredivo')) return { icon: 'fa-credit-card', bg: 'bg-purple-100 text-purple-700', border: 'border-purple-200', tagBg: 'bg-purple-50 text-purple-700' };
+      if (n.includes('belanja') || n.includes('rumah tangga') || n.includes('pasar')) return { icon: 'fa-cart-shopping', bg: 'bg-emerald-100 text-emerald-700', border: 'border-emerald-200', tagBg: 'bg-emerald-50 text-emerald-700' };
+      if (n.includes('keuangan') || n.includes('bank') || n.includes('tarik')) return { icon: 'fa-building-columns', bg: 'bg-sky-100 text-sky-700', border: 'border-sky-200', tagBg: 'bg-sky-50 text-sky-700' };
+      if (n.includes('kendaraan') || n.includes('jalan') || n.includes('tiket') || n.includes('inap')) return { icon: 'fa-plane-departure', bg: 'bg-teal-100 text-teal-700', border: 'border-teal-200', tagBg: 'bg-teal-50 text-teal-700' };
+      if (n.includes('etf') || n.includes('saham')) return { icon: 'fa-arrow-trend-up', bg: 'bg-cyan-100 text-cyan-800', border: 'border-cyan-200', tagBg: 'bg-cyan-50 text-cyan-800' };
+      if (n.includes('crypto') || n.includes('bitcoin')) return { icon: 'fa-coins', bg: 'fa-bitcoin bg-yellow-100 text-yellow-800', border: 'border-yellow-200', tagBg: 'bg-yellow-50 text-yellow-800' };
+      if (n.includes('reksadana')) return { icon: 'fa-chart-pie', bg: 'bg-emerald-100 text-emerald-800', border: 'border-emerald-200', tagBg: 'bg-emerald-50 text-emerald-800' };
+      if (n.includes('darurat')) return { icon: 'fa-shield-halved', bg: 'bg-red-100 text-red-700', border: 'border-red-200', tagBg: 'bg-red-50 text-red-700' };
+      if (n.includes('khusus') || n.includes('umroh') || n.includes('haji')) return { icon: 'fa-kaaba', bg: 'bg-teal-100 text-teal-800', border: 'border-teal-200', tagBg: 'bg-teal-50 text-teal-800' };
+      if (n.includes('gaji') || n.includes('pendapatan') || n.includes('bonus')) return { icon: 'fa-wallet', bg: 'bg-emerald-100 text-emerald-700', border: 'border-emerald-200', tagBg: 'bg-emerald-50 text-emerald-700' };
+      return { icon: 'fa-tag', bg: 'bg-slate-100 text-slate-700', border: 'border-slate-200', tagBg: 'bg-slate-50 text-slate-700' };
+    }
+
+        // --- Category Dropdown Populate in Input Form & Synchronize Custom UI Buttons ---
     function updateCategoryDropdowns() {
       const catSelect = document.getElementById('select-category');
       const subSelect = document.getElementById('select-subcategory');
@@ -1803,7 +2007,24 @@
         catSelect.value = catKeys[0];
       }
 
+      updateSelectedCategoryDisplay();
       updateSubcategoryDropdown();
+    }
+
+    function updateSelectedCategoryDisplay() {
+      const catSelect = document.getElementById('select-category');
+      const nameEl = document.getElementById('display-selected-category-name');
+      const iconBox = document.getElementById('display-cat-icon-box');
+      if (!catSelect || !nameEl) return;
+
+      const cur = catSelect.value || 'Pilih Kategori';
+      nameEl.textContent = cur;
+
+      if (iconBox) {
+        const cfg = getCategoryIconConfig(cur);
+        iconBox.className = `w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center text-sm shrink-0 shadow-xs`;
+        iconBox.innerHTML = `<i class="fa-solid ${cfg.icon}"></i>`;
+      }
     }
 
     function updateSubcategoryDropdown() {
@@ -1828,10 +2049,206 @@
       } else if (subs.length > 0) {
         subSelect.value = subs[0];
       }
+
+      updateSelectedSubcategoryDisplay();
       updatePaylaterNotice();
     }
 
+    function updateSelectedSubcategoryDisplay() {
+      const subSelect = document.getElementById('select-subcategory');
+      const nameEl = document.getElementById('display-selected-subcategory-name');
+      const iconBox = document.getElementById('display-sub-icon-box');
+      if (!subSelect || !nameEl) return;
+
+      const cur = subSelect.value || 'Pilih Subkategori';
+      nameEl.textContent = cur;
+
+      if (iconBox) {
+        const catSelect = document.getElementById('select-category');
+        const curCat = catSelect ? catSelect.value : '';
+        const isPL = (cur || '').toLowerCase().includes('paylater') || (curCat || '').toLowerCase().includes('paylater');
+        
+        if (isPL) {
+          iconBox.className = 'w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-sm shrink-0 shadow-xs';
+          iconBox.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        } else {
+          iconBox.className = 'w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-sm shrink-0 shadow-xs';
+          iconBox.innerHTML = '<i class="fa-solid fa-list-check"></i>';
+        }
+      }
+    }
+
     // --- Render Category Manager in Tab ---
+    
+    // --- MODAL POPUP LOGIC: CATEGORY & SUBCATEGORY PICKERS ---
+    function openCategoryPickerModal() {
+      const modal = document.getElementById('modal-category-picker');
+      const grid = document.getElementById('picker-categories-grid');
+      const label = document.getElementById('picker-cat-type-label');
+      const searchInput = document.getElementById('input-search-category-picker');
+      if (!modal || !grid) return;
+
+      if (searchInput) searchInput.value = '';
+      if (label) label.textContent = `Untuk transaksi jenis: ${currentType}`;
+
+      renderCategoryPickerGrid('');
+      modal.classList.remove('hidden');
+    }
+
+    function closeCategoryPickerModal() {
+      const modal = document.getElementById('modal-category-picker');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderCategoryPickerGrid(searchQuery = '') {
+      const grid = document.getElementById('picker-categories-grid');
+      const catSelect = document.getElementById('select-category');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+      const currentCats = categories[currentType] || {};
+      const catKeys = Object.keys(currentCats);
+      const activeCat = catSelect ? catSelect.value : '';
+      const q = (searchQuery || '').toLowerCase();
+
+      const filtered = catKeys.filter(k => k.toLowerCase().includes(q));
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-2 py-8 text-center text-slate-400">
+            <i class="fa-solid fa-box-open text-2xl mb-1 block"></i>
+            <span class="text-xs">Tidak ada kategori yang cocok dengan "${searchQuery}"</span>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(catName => {
+        const subs = currentCats[catName] || [];
+        const cfg = getCategoryIconConfig(catName);
+        const isSelected = catName === activeCat;
+
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `touch-btn p-3 rounded-2xl border text-left flex items-start gap-3 transition ${
+          isSelected 
+            ? 'bg-emerald-50/90 border-emerald-500 shadow-sm ring-2 ring-emerald-500/20' 
+            : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-emerald-300'
+        }`;
+
+        card.innerHTML = `
+          <div class="w-10 h-10 rounded-xl ${cfg.bg} flex items-center justify-center text-base shrink-0 shadow-xs">
+            <i class="fa-solid ${cfg.icon}"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-bold text-slate-900 text-xs sm:text-sm block truncate leading-tight">${catName}</span>
+              ${isSelected ? '<i class="fa-solid fa-circle-check text-emerald-600 text-xs shrink-0"></i>' : ''}
+            </div>
+            <span class="text-[10px] text-slate-500 mt-0.5 block">${subs.length} item</span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          if (catSelect) {
+            catSelect.value = catName;
+            updateSelectedCategoryDisplay();
+            updateSubcategoryDropdown();
+          }
+          closeCategoryPickerModal();
+          // Automatically prompt subcategory modal for fast smooth flow
+          setTimeout(() => {
+            openSubcategoryPickerModal();
+          }, 150);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    function openSubcategoryPickerModal() {
+      const modal = document.getElementById('modal-subcategory-picker');
+      const list = document.getElementById('picker-subcategories-list');
+      const parentLabel = document.getElementById('picker-sub-cat-parent-label');
+      const searchInput = document.getElementById('input-search-subcategory-picker');
+      const catSelect = document.getElementById('select-category');
+      if (!modal || !list) return;
+
+      const activeCat = catSelect ? catSelect.value : '';
+      if (parentLabel) parentLabel.textContent = `Kategori: ${activeCat || 'Semua'}`;
+      if (searchInput) searchInput.value = '';
+
+      renderSubcategoryPickerList('');
+      modal.classList.remove('hidden');
+    }
+
+    function closeSubcategoryPickerModal() {
+      const modal = document.getElementById('modal-subcategory-picker');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderSubcategoryPickerList(searchQuery = '') {
+      const list = document.getElementById('picker-subcategories-list');
+      const catSelect = document.getElementById('select-category');
+      const subSelect = document.getElementById('select-subcategory');
+      if (!list) return;
+
+      list.innerHTML = '';
+      const activeCat = catSelect ? catSelect.value : '';
+      const subs = (categories[currentType] && categories[currentType][activeCat]) || [];
+      const activeSub = subSelect ? subSelect.value : '';
+      const q = (searchQuery || '').toLowerCase();
+
+      const filtered = subs.filter(s => s.toLowerCase().includes(q));
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="py-8 text-center text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-2xl mb-1 block"></i>
+            <span class="text-xs">Subkategori "${searchQuery}" tidak ditemukan</span>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(subName => {
+        const isSelected = subName === activeSub;
+        const isPL = subName.toLowerCase().includes('paylater') || (activeCat || '').toLowerCase().includes('paylater');
+
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = `touch-btn w-full p-3 rounded-xl border flex items-center justify-between transition ${
+          isSelected 
+            ? 'bg-teal-50 border-teal-500 shadow-xs' 
+            : 'bg-white hover:bg-slate-50 border-slate-200'
+        }`;
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg ${isPL ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700'} flex items-center justify-center text-xs shrink-0">
+              <i class="fa-solid ${isPL ? 'fa-clock-rotate-left' : 'fa-check'}"></i>
+            </div>
+            <div class="text-left">
+              <span class="font-bold text-slate-900 text-xs sm:text-sm block leading-tight">${subName}</span>
+              ${isPL ? '<span class="text-[10px] text-purple-700 font-semibold">Alur Paylater (Jatuh tempo 30 hari / tgl 25)</span>' : ''}
+            </div>
+          </div>
+          ${isSelected ? '<i class="fa-solid fa-circle-check text-teal-600 text-base"></i>' : '<i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>'}
+        `;
+
+        item.addEventListener('click', () => {
+          if (subSelect) {
+            subSelect.value = subName;
+            updateSelectedSubcategoryDisplay();
+            updatePaylaterNotice();
+          }
+          closeSubcategoryPickerModal();
+        });
+
+        list.appendChild(item);
+      });
+    }
+
     function renderCategoryManager() {
       const container = document.getElementById('categories-list-container');
       if (!container) return;
@@ -2145,6 +2562,169 @@
       }
     }
 
+    
+    // --- MODAL POPUP LOGIC: WALLET PICKER ---
+    let activeWalletPickerTarget = 'main'; // 'main' | 'trf-from' | 'trf-to'
+
+    function openWalletPickerModal(target = 'main') {
+      activeWalletPickerTarget = target;
+      const modal = document.getElementById('modal-wallet-picker');
+      const title = document.getElementById('picker-wallet-title');
+      const subtitle = document.getElementById('picker-wallet-subtitle');
+      const searchInput = document.getElementById('input-search-wallet-picker');
+      if (!modal) return;
+
+      if (target === 'trf-from') {
+        if (title) title.textContent = 'Pilih Dompet Asal (Pengirim)';
+        if (subtitle) subtitle.textContent = 'Saldo dompet ini akan terpotong untuk transfer';
+      } else if (target === 'trf-to') {
+        if (title) title.textContent = 'Pilih Dompet Tujuan (Penerima)';
+        if (subtitle) subtitle.textContent = 'Saldo dompet ini akan bertambah';
+      } else {
+        if (title) title.textContent = 'Pilih Dompet / Sumber Dana';
+        if (subtitle) subtitle.textContent = 'Pilih rekening bank, e-wallet, atau kas';
+      }
+
+      if (searchInput) searchInput.value = '';
+      renderWalletPickerList('');
+      modal.classList.remove('hidden');
+    }
+
+    function closeWalletPickerModal() {
+      const modal = document.getElementById('modal-wallet-picker');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderWalletPickerList(searchQuery = '') {
+      const list = document.getElementById('picker-wallets-list');
+      if (!list) return;
+
+      list.innerHTML = '';
+      const q = (searchQuery || '').toLowerCase();
+
+      let targetSelect = document.getElementById('select-wallet');
+      if (activeWalletPickerTarget === 'trf-from') targetSelect = document.getElementById('select-form-transfer-from');
+      if (activeWalletPickerTarget === 'trf-to') targetSelect = document.getElementById('select-form-transfer-to');
+      const activeId = targetSelect ? targetSelect.value : '';
+
+      const filtered = wallets.filter(w => {
+        return w.name.toLowerCase().includes(q) || w.type.toLowerCase().includes(q);
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="py-8 text-center text-slate-400">
+            <i class="fa-solid fa-wallet text-2xl mb-1 block"></i>
+            <span class="text-xs">Tidak ada dompet yang cocok dengan "${searchQuery}"</span>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(w => {
+        const isSelected = w.id === activeId;
+        const logoHtml = getWalletLogoHtml(w.name, w.type, 'md');
+
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = `touch-btn w-full p-3 sm:p-3.5 rounded-2xl border text-left flex items-center justify-between transition ${
+          isSelected 
+            ? 'bg-emerald-50/90 border-emerald-500 shadow-sm ring-2 ring-emerald-500/20' 
+            : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-emerald-300'
+        }`;
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3 truncate">
+            ${logoHtml}
+            <div class="truncate">
+              <span class="font-bold text-slate-900 text-xs sm:text-sm block truncate leading-tight">${w.name}</span>
+              <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block mt-0.5">${w.type}</span>
+            </div>
+          </div>
+          <div class="text-right shrink-0 ml-2 flex items-center gap-2">
+            <div>
+              <span class="text-xs sm:text-sm font-extrabold ${w.balance < 0 ? 'text-rose-600' : 'text-slate-900'} block">
+                ${formatRupiah(w.balance)}
+              </span>
+              <span class="text-[10px] text-slate-400 block">${w.type === 'Paylater' ? 'Tagihan tempo' : 'Saldo'}</span>
+            </div>
+            ${isSelected ? '<i class="fa-solid fa-circle-check text-emerald-600 text-base"></i>' : '<i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>'}
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          if (targetSelect) {
+            targetSelect.value = w.id;
+            if (activeWalletPickerTarget === 'main') {
+              updateSelectedWalletDisplay();
+            } else {
+              updateTransferFormsDisplay();
+            }
+          }
+          closeWalletPickerModal();
+        });
+
+        list.appendChild(card);
+      });
+    }
+
+    function updateSelectedWalletDisplay() {
+      const walletSelect = document.getElementById('select-wallet');
+      const nameEl = document.getElementById('display-selected-wallet-name');
+      const badgeEl = document.getElementById('display-selected-wallet-badge');
+      const logoBox = document.getElementById('display-wallet-logo-box');
+      const hint = document.getElementById('selected-wallet-balance-hint');
+      if (!walletSelect || !nameEl) return;
+
+      const selectedId = walletSelect.value;
+      const w = wallets.find(x => x.id === selectedId) || wallets[0];
+      if (w) {
+        nameEl.textContent = w.name;
+        if (badgeEl) {
+          badgeEl.textContent = formatRupiah(w.balance);
+          badgeEl.className = `text-xs font-extrabold px-2.5 py-1 rounded-lg ${
+            w.balance < 0 ? 'text-rose-700 bg-rose-50 border border-rose-200' : 'text-emerald-700 bg-emerald-50 border border-emerald-200'
+          }`;
+        }
+        if (logoBox) {
+          logoBox.innerHTML = getWalletLogoHtml(w.name, w.type, 'sm');
+        }
+        if (hint) {
+          hint.innerHTML = `<span class="inline-flex items-center gap-1">${getWalletLogoHtml(w.name, w.type, 'xs')} Saldo: ${formatRupiah(w.balance)}</span>`;
+          hint.className = w.balance < 0 ? 'text-[11px] font-bold text-rose-600' : 'text-[11px] font-bold text-emerald-600';
+        }
+      }
+    }
+
+    function updateTransferFormsDisplay() {
+      const fromSelect = document.getElementById('select-form-transfer-from');
+      const toSelect = document.getElementById('select-form-transfer-to');
+      const nameFrom = document.getElementById('display-selected-trf-from-name');
+      const nameTo = document.getElementById('display-selected-trf-to-name');
+      const logoFrom = document.getElementById('display-trf-from-logo-box');
+      const logoTo = document.getElementById('display-trf-to-logo-box');
+      const hintFrom = document.getElementById('hint-form-transfer-from');
+      const hintTo = document.getElementById('hint-form-transfer-to');
+
+      if (fromSelect && nameFrom) {
+        const wFrom = wallets.find(x => x.id === fromSelect.value);
+        if (wFrom) {
+          nameFrom.textContent = wFrom.name;
+          if (logoFrom) logoFrom.innerHTML = getWalletLogoHtml(wFrom.name, wFrom.type, 'sm');
+          if (hintFrom) hintFrom.innerHTML = `<span class="inline-flex items-center gap-1">${getWalletLogoHtml(wFrom.name, wFrom.type, 'xs')} Saldo: ${formatRupiah(wFrom.balance)}</span>`;
+        }
+      }
+
+      if (toSelect && nameTo) {
+        const wTo = wallets.find(x => x.id === toSelect.value);
+        if (wTo) {
+          nameTo.textContent = wTo.name;
+          if (logoTo) logoTo.innerHTML = getWalletLogoHtml(wTo.name, wTo.type, 'sm');
+          if (hintTo) hintTo.innerHTML = `<span class="inline-flex items-center gap-1">${getWalletLogoHtml(wTo.name, wTo.type, 'xs')} Saldo: ${formatRupiah(wTo.balance)}</span>`;
+        }
+      }
+    }
+
     function updateWalletDropdowns() {
       const walletSelect = document.getElementById('select-wallet');
       const transferFrom = document.getElementById('transfer-from-wallet');
@@ -2225,7 +2805,9 @@
         }
 
         updateFormTransferHints();
+        updateTransferFormsDisplay();
       }
+      updateSelectedWalletDisplay();
     }
 
     function updateFormTransferHints() {
@@ -3891,6 +4473,102 @@
           }
           await syncWalletsToFirebase();
           showToast(`Berhasil mengunggah ${count} transaksi & daftar dompet ke Firestore!`, "success");
+        });
+      }
+
+            // Category & Subcategory Interactive Modal Pickers Triggers
+            // Wallet Interactive Modal Pickers Triggers
+      const btnTrigWallet = document.getElementById('btn-trigger-wallet-picker');
+      const btnTrigTrfFrom = document.getElementById('btn-trigger-transfer-from-picker');
+      const btnTrigTrfTo = document.getElementById('btn-trigger-transfer-to-picker');
+      const btnCloseWalletPicker = document.getElementById('btn-close-wallet-picker');
+      const btnGotoAddWalletFromModal = document.getElementById('btn-goto-add-wallet-from-modal');
+      const inputSearchWallet = document.getElementById('input-search-wallet-picker');
+
+      if (btnTrigWallet) {
+        btnTrigWallet.addEventListener('click', () => openWalletPickerModal('main'));
+      }
+      if (btnTrigTrfFrom) {
+        btnTrigTrfFrom.addEventListener('click', () => openWalletPickerModal('trf-from'));
+      }
+      if (btnTrigTrfTo) {
+        btnTrigTrfTo.addEventListener('click', () => openWalletPickerModal('trf-to'));
+      }
+      if (btnCloseWalletPicker) {
+        btnCloseWalletPicker.addEventListener('click', closeWalletPickerModal);
+      }
+      if (btnGotoAddWalletFromModal) {
+        btnGotoAddWalletFromModal.addEventListener('click', () => {
+          closeWalletPickerModal();
+          openWalletModal(null);
+        });
+      }
+      if (inputSearchWallet) {
+        inputSearchWallet.addEventListener('input', (e) => {
+          renderWalletPickerList(e.target.value);
+        });
+      }
+
+      const btnTrigCat = document.getElementById('btn-trigger-category-picker');
+      const btnTrigSub = document.getElementById('btn-trigger-subcategory-picker');
+      const btnCloseCatPicker = document.getElementById('btn-close-category-picker');
+      const btnCloseSubPicker = document.getElementById('btn-close-subcategory-picker');
+      const btnGotoManageFromModal = document.getElementById('btn-goto-manage-cats-from-modal');
+      const inputSearchCat = document.getElementById('input-search-category-picker');
+      const inputSearchSub = document.getElementById('input-search-subcategory-picker');
+      const btnInlineAddSub = document.getElementById('btn-inline-modal-add-sub');
+      const inputInlineNewSub = document.getElementById('input-inline-modal-new-sub');
+
+      if (btnTrigCat) {
+        btnTrigCat.addEventListener('click', openCategoryPickerModal);
+      }
+      if (btnTrigSub) {
+        btnTrigSub.addEventListener('click', openSubcategoryPickerModal);
+      }
+      if (btnCloseCatPicker) {
+        btnCloseCatPicker.addEventListener('click', closeCategoryPickerModal);
+      }
+      if (btnCloseSubPicker) {
+        btnCloseSubPicker.addEventListener('click', closeSubcategoryPickerModal);
+      }
+      if (btnGotoManageFromModal) {
+        btnGotoManageFromModal.addEventListener('click', () => {
+          closeCategoryPickerModal();
+          switchTab('tab-categories');
+        });
+      }
+      if (inputSearchCat) {
+        inputSearchCat.addEventListener('input', (e) => {
+          renderCategoryPickerGrid(e.target.value);
+        });
+      }
+      if (inputSearchSub) {
+        inputSearchSub.addEventListener('input', (e) => {
+          renderSubcategoryPickerList(e.target.value);
+        });
+      }
+      if (btnInlineAddSub && inputInlineNewSub) {
+        btnInlineAddSub.addEventListener('click', () => {
+          const val = inputInlineNewSub.value.trim();
+          const catSelect = document.getElementById('select-category');
+          const activeCat = catSelect ? catSelect.value : '';
+          if (!val) {
+            showToast("Nama subkategori tidak boleh kosong!", "error");
+            inputInlineNewSub.focus();
+            return;
+          }
+          if (categories[currentType] && categories[currentType][activeCat]) {
+            if (categories[currentType][activeCat].includes(val)) {
+              showToast("Subkategori sudah ada!", "error");
+              return;
+            }
+            categories[currentType][activeCat].push(val);
+            saveCategories();
+            updateSubcategoryDropdown();
+            renderSubcategoryPickerList('');
+            inputInlineNewSub.value = '';
+            showToast(`Subkategori "${val}" berhasil ditambahkan!`, "success");
+          }
         });
       }
 
