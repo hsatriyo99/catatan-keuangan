@@ -1180,23 +1180,33 @@
     // --- Master Category Structure (Tailored from user's Rencana Keuangan 2025) ---
     const DEFAULT_CATEGORIES = {
       Pengeluaran: {
-        "Makanan & Jajan": [
-          "Makan Harian", "Belanja Pasar", "Jajan / Cemilan", "Sangu Pepo", "Sangu Iyo"
-        ],
         "Transportasi": [
-          "Bensin Motor", "Bensin Serena", "Ojeg Pepo", "E-Toll / Parkir", "Servis Kendaraan"
+          "Bahan Bakar", "EV Charging", "Ojek & Taxi Online", "E-Toll / Parkir"
         ],
-        "Kebutuhan Rumah": [
-          "Listrik PLN", "Aqua Galon", "Makanan Kucing", "Pulsa & Internet", "ART Wini", "Iuran Sanctuary"
+        "Makanan & Minuman": [
+          "Pesan Antar Makanan", "Jajan / Cemilan", "Restoran & Cafe", "Bahan Makanan"
         ],
-        "Pendidikan Anak": [
-          "SPP Kelas 5", "SPP Kelas 8", "SPP Kelas 12", "Iuran Kas & Komite", "Uang Pembelajaran / Galon"
+        "Pendidikan": [
+          "Uang Sekolah & Kursus", "Buku & Alat tulis", "Iuran Kas & Komite", "Saku SMA"
         ],
-        "Pembayaran Tagihan & Hutang": [
-          "Bayar Paylater", "Bayar Kartu Kredit", "Bayar Cicilan Lainnya"
+        "Tagihan & Langganan": [
+          "Listrik", "Air", "Gas", "Pulsa & Paket Data", "Internet Rumah", "Cloud & Layanan AI"
         ],
-        "Lain-lain": [
-          "Bayar Paylater", "Tiket & Hiburan", "Kesehatan & Obat", "Lainnya"
+        "Kesehatan & Lifestyle": [
+          "Obat & Apotek", "Olahraga & Gym", "Vitamin & suplemen", "Hewan Peliharaan",
+          "Elektronik & Gadget", "Hiburan & Rekreasi", "Perawatan Diri", "Arisan"
+        ],
+        "Pinjaman & Paylater": [
+          "Cicilan Rumah", "Cicilan Mobil", "Cicilan Motor", "Kredivo", "SPaylater", "YUP"
+        ],
+        "Belanja Rumah Tangga": [
+          "Supermarket / Retail", "Marketplace", "Perbaikan / Service"
+        ],
+        "Keuangan & Bank": [
+          "Tarik Tunai", "Biaya Admin Bank"
+        ],
+        "Kendaraan & Perjalanan": [
+          "Pajak Kendaraan", "Suku Cadang & Service", "Maintenance", "Tiket", "Penginapan"
         ]
       },
       Pemasukan: {
@@ -1204,20 +1214,32 @@
           "Gaji Pokok", "Bonus / Tunjangan", "Insentif", "Freelance / Usaha"
         ],
         "Pemasukan Lain": [
-          "Cashback / Hadiah", "Pengembalian Dana", "Lainnya"
+          "Cashback / Hadiah", "Pengembalian Dana", "Dividen / Imbal Hasil", "Lainnya"
         ]
       },
       Investasi: {
-        "Aset & Portofolio": [
-          "Emas Antam", "Reksa Dana (Bareksa/Makmur)", "ETF SPY / Saham", "Dana Darurat", "Dana Tabungan"
+        "ETF / Saham US": [
+          "SPY", "VOO", "SCHD", "NVDA", "SLV"
+        ],
+        "Crypto": [
+          "Bitcoin", "PAXG"
+        ],
+        "Reksadana / Saham ID": [
+          "BMRI", "Reksadana Pasar Uang"
+        ],
+        "Dana Darurat": [
+          "Tabungan Dana Darurat"
+        ],
+        "Dana Khusus": [
+          "Umroh", "Haji"
         ]
       },
       Cicilan: {
-        "Kewajiban Tetap": [
-          "KPR Rumah (CIMB)", "Cicilan Mobil (BCA)"
+        "Penyedia Paylater": [
+          "Kredivo Paylater", "Shopee Paylater", "YUP Paylater"
         ],
-        "Paylater & FinTech": [
-          "Paylater", "Paylater Yup", "Paylater Kredivo", "Indodana", "ShopeePay Paylater", "Kartu Kredit"
+        "Pinjaman & Cicilan Tetap": [
+          "Cicilan Rumah", "Cicilan Mobil", "Cicilan Motor"
         ]
       }
     };
@@ -1290,15 +1312,55 @@
       }
     }
 
-    function calculateDueDate(dateStr) {
+        function calculateDueDate(dateStr, provider = '') {
       try {
-        const d = new Date(dateStr || new Date());
+        const base = new Date(dateStr || new Date());
+        const prov = (provider || '').toLowerCase();
+
+        // Kredivo: jatuh tempo 30 hari sejak tanggal transaksi
+        if (prov.includes('kredivo')) {
+          const d = new Date(base);
+          d.setDate(d.getDate() + 30);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return {
+            dueDate: `${y}-${m}-${day}`,
+            ruleText: 'Jatuh tempo 30 hari dari transaksi'
+          };
+        }
+
+        // Shopee Paylater / SPaylater dan YUP Paylater: jatuh tempo tanggal 25 bulan berikutnya
+        if (prov.includes('shopee') || prov.includes('spaylater') || prov.includes('yup')) {
+          const year = base.getFullYear();
+          const month = base.getMonth();
+          const nextMonthDate = new Date(year, month + 1, 25);
+          const y = nextMonthDate.getFullYear();
+          const m = String(nextMonthDate.getMonth() + 1).padStart(2, '0');
+          const day = String(nextMonthDate.getDate()).padStart(2, '0');
+          return {
+            dueDate: `${y}-${m}-${day}`,
+            ruleText: 'Jatuh tempo tgl 25 bulan berikutnya'
+          };
+        }
+
+        // Default paylater fallback (30 hari)
+        const d = new Date(base);
         d.setDate(d.getDate() + 30);
-        return d.toISOString().split('T')[0];
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return {
+          dueDate: `${y}-${m}-${day}`,
+          ruleText: 'Jatuh tempo 30 hari'
+        };
       } catch (e) {
         const d = new Date();
         d.setDate(d.getDate() + 30);
-        return d.toISOString().split('T')[0];
+        return {
+          dueDate: d.toISOString().split('T')[0],
+          ruleText: 'Jatuh tempo 30 hari'
+        };
       }
     }
 
@@ -1312,18 +1374,26 @@
       }
     }
 
-    function isPaylaterDebtTx(type, category, subcategory) {
-      if (type !== 'Cicilan') return false;
+        function isPaylaterDebtTx(type, category, subcategory) {
+      if (type !== 'Cicilan' && type !== 'Paylater') return false;
       const sub = (subcategory || '').toLowerCase();
       const cat = (category || '').toLowerCase();
-      return sub.includes('paylater') || cat.includes('paylater');
+      return cat.includes('paylater') || sub.includes('paylater') || 
+             sub.includes('kredivo') || sub.includes('shopee') || sub.includes('spaylater') || sub.includes('yup');
     }
 
     function isPaylaterPaymentTx(type, category, subcategory) {
       if (type !== 'Pengeluaran') return false;
       const sub = (subcategory || '').toLowerCase();
       const cat = (category || '').toLowerCase();
-      return sub.includes('bayar paylater') || cat.includes('bayar paylater');
+
+      // Transaksi pengeluaran untuk pelunasan paylater
+      if (cat.includes('paylater') || cat.includes('pinjaman')) {
+        if (sub.includes('kredivo') || sub.includes('spaylater') || sub.includes('shopee') || sub.includes('yup') || sub.includes('bayar')) {
+          return true;
+        }
+      }
+      return sub.includes('bayar paylater') || sub.includes('bayar kredivo') || sub.includes('bayar spaylater') || sub.includes('bayar yup');
     }
 
     function getAccumulatedPaylaterDebt() {
@@ -1477,7 +1547,7 @@
     function loadData() {
       try {
         // Load Categories
-        const savedCategories = localStorage.getItem("catat_cepat_categories_v3");
+        const savedCategories = localStorage.getItem("catat_cepat_categories_v4");
         if (savedCategories) {
           categories = JSON.parse(savedCategories);
           ensurePaylaterCategories();
@@ -1562,7 +1632,7 @@
 
     function saveCategories() {
       try {
-        localStorage.setItem("catat_cepat_categories_v3", JSON.stringify(categories));
+        localStorage.setItem("catat_cepat_categories_v4", JSON.stringify(categories));
       } catch (e) {
         console.error("Failed saving categories", e);
       }
@@ -1657,7 +1727,7 @@
 
     // --- Category Dropdown Populate in Input Form ---
     
-    function updatePaylaterNotice() {
+        function updatePaylaterNotice() {
       const noticeBox = document.getElementById('paylater-flow-notice');
       if (!noticeBox) return;
 
@@ -1674,15 +1744,20 @@
       const curDate = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
 
       if (isPaylaterDebtTx(currentType, curCat, curSub)) {
-        const dueDate = calculateDueDate(curDate);
+        const dueInfo = calculateDueDate(curDate, curSub || curCat);
         noticeBox.className = 'mb-4 p-3.5 rounded-xl bg-purple-50/90 border border-purple-200 text-purple-950 text-xs flex items-start gap-3 shadow-xs';
         noticeBox.innerHTML = `
           <div class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 text-xs">
             <i class="fa-solid fa-clock-rotate-left"></i>
           </div>
           <div class="leading-relaxed">
-            <strong class="font-bold text-purple-950 block mb-0.5">Alur Transaksi Paylater:</strong>
-            Transaksi ini <span class="underline font-bold text-purple-800">TIDAK mengurangi saldo kas/bank bulan berjalan</span>. Dicatat sebagai Hutang yang harus dibayar 30 hari ke depan (Jatuh tempo: <strong>${formatShortDate(dueDate)}</strong>). Total hutang akan bertambah secara akumulatif.
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <strong class="font-bold text-purple-950 block">Alur Transaksi Paylater (${curSub || 'Paylater'}):</strong>
+              <span class="text-[10px] bg-purple-200 text-purple-900 px-1.5 py-0.2 rounded font-bold">${dueInfo.ruleText}</span>
+            </div>
+            <div class="mt-1 text-slate-700">
+              Transaksi ini <span class="underline font-bold text-purple-800">TIDAK mengurangi saldo kas/bank bulan berjalan</span>. Dicatat sebagai Hutang yang harus dibayar pada: <strong>${formatShortDate(dueInfo.dueDate)}</strong>. Total hutang Paylater akan bertambah secara akumulatif.
+            </div>
           </div>
         `;
         noticeBox.classList.remove('hidden');
@@ -1694,8 +1769,8 @@
             <i class="fa-solid fa-receipt"></i>
           </div>
           <div class="leading-relaxed">
-            <strong class="font-bold text-emerald-950 block mb-0.5">Alur Pembayaran Paylater:</strong>
-            Transaksi ini akan <span class="underline font-bold text-emerald-800">memotong saldo dompet</span> yang dipilih dan <span class="underline font-bold text-emerald-800">mengurangi jumlah Hutang Paylater</span> yang tercatat. (Total hutang tercatat saat ini: <strong>${formatRupiah(currentDebt)}</strong>).
+            <strong class="font-bold text-emerald-950 block mb-0.5">Alur Pelunasan Paylater (${curSub}):</strong>
+            Transaksi ini akan <span class="underline font-bold text-emerald-800">memotong saldo dompet</span> yang dipilih dan <span class="underline font-bold text-emerald-800">mengurangi akumulasi jumlah Hutang Paylater</span> tercatat. (Total hutang tercatat saat ini: <strong>${formatRupiah(currentDebt)}</strong>).
           </div>
         `;
         noticeBox.classList.remove('hidden');
@@ -1995,7 +2070,9 @@
       if (n.includes('bri')) return 'bri';
       if (n.includes('jago')) return 'jago';
       if (n.includes('gopay')) return 'gopay';
-      if (n.includes('shopee')) return 'shopeepay';
+      if (n.includes('shopee') || n.includes('spaylater')) return 'shopeepay';
+      if (n.includes('bitcoin') || n.includes('crypto')) return 'saham';
+      if (n.includes('bmri')) return 'mandiri';
       if (n.includes('ovo')) return 'ovo';
       if (n.includes('reksa dana') || n.includes('reksadana') || n.includes('bareksa') || n.includes('makmur')) return 'reksadana';
       if (/dana/i.test(n)) return 'dana';
@@ -2528,7 +2605,7 @@
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="font-bold text-slate-800 text-xs">${t.subcategory || t.category}</span>
                 <span class="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded font-medium">${t.category}</span>
-                ${isPLDebt ? `<span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded flex items-center gap-1"><i class="fa-solid fa-clock text-[9px]"></i> Tempo 30 Hari: ${formatShortDate(t.dueDate || calculateDueDate(t.date))} (Saldo Kas Aman)</span>` : ''}
+                ${isPLDebt ? `<span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded flex items-center gap-1"><i class="fa-solid fa-clock text-[9px]"></i> Tempo: ${formatShortDate(t.dueDate || calculateDueDate(t.date, t.subcategory).dueDate)} (Saldo Kas Aman)</span>` : ''}
                 ${isPLPay ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded flex items-center gap-1"><i class="fa-solid fa-circle-check text-[9px]"></i> Pelunasan Hutang Paylater</span>` : ''}
               </div>
               <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
@@ -3448,7 +3525,8 @@
 
         // ATURAN 1: Cicilan/Hutang subkategori Paylater TIDAK memotong saldo kas/bank bulan berjalan, menjadi hutang tempo 30 hari
         if (isPaylaterDebt) {
-          const dueDate = calculateDueDate(date);
+          const dueInfo = calculateDueDate(date, subcategory || category);
+          const dueDate = dueInfo.dueDate;
           const paylaterW = wallets.find(w => w.type === 'Paylater' || w.name.toLowerCase().includes('paylater')) || targetWallet;
 
           const newTx = {
@@ -3479,7 +3557,7 @@
           if (syncImmediately) {
             syncToSheets([newTx]);
           } else {
-            showToast(`Tagihan Paylater ${formatRupiah(amount)} dicatat! Saldo bulan ini tidak terpotong. Jatuh tempo: ${formatShortDate(dueDate)}`, "success");
+            showToast(`Tagihan ${subcategory || 'Paylater'} ${formatRupiah(amount)} dicatat! Saldo kas aman. Jatuh tempo: ${formatShortDate(dueDate)} (${dueInfo.ruleText})`, "success");
           }
           return;
         }
