@@ -841,6 +841,25 @@
         </div>
       </div>
 
+      <!-- RESET DATA / FACTORY RESET CARD -->
+      <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-5 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-rose-950 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-rotate-left text-rose-600"></i>
+              Reset Semua Data Aplikasi Seperti Baru
+            </h3>
+            <p class="text-xs text-rose-800 mt-0.5">
+              Kosongkan semua riwayat transaksi, atur saldo dompet menjadi Rp 0, dan mulai pencatatan keuangan dari awal yang bersih.
+            </p>
+          </div>
+          <button type="button" id="btn-open-factory-reset-modal" class="touch-btn shrink-0 px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition flex items-center gap-1.5">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>Reset Data Seperti Baru</span>
+          </button>
+        </div>
+      </div>
+
       <!-- GOOGLE SHEETS SETUP CARD -->
       <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-6">
         
@@ -1341,6 +1360,23 @@
     </div>
   </div>
 
+  <!-- Modal: Reset Semua Data Seperti Baru Confirmation -->
+  <div id="modal-factory-reset" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xl mx-auto mb-3">
+        <i class="fa-solid fa-rotate-left"></i>
+      </div>
+      <h3 class="text-center font-bold text-slate-900 text-base">Reset Data Seperti Baru?</h3>
+      <p class="text-center text-xs text-slate-500 mt-1 mb-5 leading-relaxed">
+        Seluruh riwayat transaksi akan dikosongkan (0 transaksi), saldo semua dompet diatur ke Rp 0, dan aplikasi siap digunakan dari awal yang bersih.
+      </p>
+      <div class="flex gap-2">
+        <button id="btn-cancel-factory-reset" class="touch-btn flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">Batal</button>
+        <button id="btn-confirm-factory-reset" class="touch-btn flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition">Ya, Reset Bersih</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Hapus Dompet Confirmation -->
   <div id="wallet-delete-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
@@ -1425,16 +1461,16 @@
       }
     };
 
-    // Default Seed Wallets matching user's real accounts & investments
+    // Default Clean Wallets (Saldo 0 seperti baru siap diinput saldo awal)
     const DEFAULT_WALLETS = [
-      { id: "w-cash", name: "Uang Tunai", type: "Tunai", balance: 500000, icon: "fa-money-bill-wave", color: "emerald" },
-      { id: "w-bca", name: "Rekening BCA", type: "Bank", balance: 3500000, icon: "fa-building-columns", color: "blue" },
-      { id: "w-cimb", name: "Rekening CIMB", type: "Bank", balance: 2000000, icon: "fa-building-columns", color: "red" },
-      { id: "w-gopay", name: "GoPay", type: "E-Wallet", balance: 150000, icon: "fa-mobile-screen-button", color: "teal" },
-      { id: "w-shopee", name: "ShopeePay", type: "E-Wallet", balance: 250000, icon: "fa-bag-shopping", color: "orange" },
-      { id: "w-emas", name: "Logam Mulia (Emas)", type: "Investasi", balance: 15000000, icon: "fa-coins", color: "amber" },
-      { id: "w-reksadana", name: "Reksa Dana (Bareksa/Makmur)", type: "Investasi", balance: 8500000, icon: "fa-chart-line", color: "teal" },
-      { id: "w-etf", name: "ETF SPY / Saham", type: "Investasi", balance: 14500000, icon: "fa-arrow-trend-up", color: "sky" },
+      { id: "w-cash", name: "Uang Tunai", type: "Tunai", balance: 0, icon: "fa-money-bill-wave", color: "emerald" },
+      { id: "w-bca", name: "Rekening BCA", type: "Bank", balance: 0, icon: "fa-building-columns", color: "blue" },
+      { id: "w-cimb", name: "Rekening CIMB", type: "Bank", balance: 0, icon: "fa-building-columns", color: "red" },
+      { id: "w-gopay", name: "GoPay", type: "E-Wallet", balance: 0, icon: "fa-mobile-screen-button", color: "teal" },
+      { id: "w-shopee", name: "ShopeePay", type: "E-Wallet", balance: 0, icon: "fa-bag-shopping", color: "orange" },
+      { id: "w-emas", name: "Logam Mulia (Emas)", type: "Investasi", balance: 0, icon: "fa-coins", color: "amber" },
+      { id: "w-reksadana", name: "Reksa Dana (Bareksa/Makmur)", type: "Investasi", balance: 0, icon: "fa-chart-line", color: "teal" },
+      { id: "w-etf", name: "ETF SPY / Saham", type: "Investasi", balance: 0, icon: "fa-arrow-trend-up", color: "sky" },
       { id: "w-yup", name: "Paylater Yup", type: "Paylater", balance: 0, icon: "fa-credit-card", color: "purple" }
     ];
 
@@ -1452,26 +1488,9 @@
     let wealthTrendChart = null;
     let wealthTimeframe = 'monthly'; // 'monthly' | 'yearly'
     let customWealthSnapshots = [];
-    // Historical Seed Snapshots for Wealth Trend
-    const SEED_MONTHLY_WEALTH = [
-      { period: 'Jun 2025', cash: 4200000, invest: 21000000, debt: 4500000, netWorth: 20700000 },
-      { period: 'Jul 2025', cash: 3800000, invest: 22300000, debt: 4100000, netWorth: 22000000 },
-      { period: 'Ags 2025', cash: 4500000, invest: 24000000, debt: 3800000, netWorth: 24700000 },
-      { period: 'Sep 2025', cash: 4800000, invest: 26500000, debt: 3500000, netWorth: 27800000 },
-      { period: 'Okt 2025', cash: 4600000, invest: 28200000, debt: 3200000, netWorth: 29600000 },
-      { period: 'Nov 2025', cash: 5100000, invest: 30000000, debt: 2800000, netWorth: 32300000 },
-      { period: 'Des 2025', cash: 5800000, invest: 32500000, debt: 2500000, netWorth: 35800000 },
-      { period: 'Jan 2026', cash: 5500000, invest: 34000000, debt: 2000000, netWorth: 37500000 },
-      { period: 'Feb 2026', cash: 5900000, invest: 35200000, debt: 1800000, netWorth: 39300000 },
-      { period: 'Mar 2026', cash: 6000000, invest: 36500000, debt: 1500000, netWorth: 41000000 },
-      { period: 'Apr 2026', cash: 5800000, invest: 37000000, debt: 1200000, netWorth: 41600000 }
-    ];
-
-    const SEED_YEARLY_WEALTH = [
-      { period: '2023', cash: 2500000, invest: 12000000, debt: 0, netWorth: 14500000 },
-      { period: '2024', cash: 3800000, invest: 19000000, debt: 0, netWorth: 22800000 },
-      { period: '2025', cash: 5800000, invest: 32500000, debt: 2500000, netWorth: 35800000 }
-    ];
+    // Bersih seperti baru: Data historis awal kosong, siap merekam data riil Anda
+    const SEED_MONTHLY_WEALTH = [];
+    const SEED_YEARLY_WEALTH = [];
 
 
     // Load from LocalStorage safely
@@ -1556,10 +1575,14 @@
     }
 
         function isPaylaterDebtTx(type, category, subcategory) {
-      if (type !== 'Cicilan' && type !== 'Paylater') return false;
+      // Semua transaksi dari menu Cicilan/Hutang atau yang mengandung unsur paylater/hutang/cicilan
+      if (type === 'Cicilan' || type === 'Paylater' || type === 'Hutang') return true;
       const sub = (subcategory || '').toLowerCase();
       const cat = (category || '').toLowerCase();
       return cat.includes('paylater') || sub.includes('paylater') || 
+             cat.includes('cicil') || sub.includes('cicil') ||
+             cat.includes('pinjam') || sub.includes('pinjam') ||
+             cat.includes('hutang') || sub.includes('hutang') ||
              sub.includes('kredivo') || sub.includes('shopee') || sub.includes('spaylater') || sub.includes('yup');
     }
 
@@ -1568,19 +1591,18 @@
       const sub = (subcategory || '').toLowerCase();
       const cat = (category || '').toLowerCase();
 
-      // Transaksi pengeluaran untuk pelunasan paylater
-      if (cat.includes('paylater') || cat.includes('pinjaman')) {
-        if (sub.includes('kredivo') || sub.includes('spaylater') || sub.includes('shopee') || sub.includes('yup') || sub.includes('bayar')) {
-          return true;
-        }
+      // Transaksi pengeluaran untuk pelunasan hutang / cicilan / paylater
+      if (cat.includes('paylater') || cat.includes('pinjaman') || cat.includes('hutang') || cat.includes('cicilan')) {
+        return true;
       }
-      return sub.includes('bayar paylater') || sub.includes('bayar kredivo') || sub.includes('bayar spaylater') || sub.includes('bayar yup');
+      return sub.includes('bayar') || sub.includes('lunas') || sub.includes('kredivo') || sub.includes('spaylater') || sub.includes('shopee') || sub.includes('yup') || sub.includes('paylater');
     }
 
     function getAccumulatedPaylaterDebt() {
       let debt = 0;
       transactions.forEach(t => {
         const amt = Number(t.amount) || 0;
+        // Akumulasi dari semua transaksi menu Cicilan/Hutang
         if (t.isPaylaterDebt || isPaylaterDebtTx(t.type, t.category, t.subcategory)) {
           debt += amt;
         } else if (t.isPaylaterPayment || isPaylaterPaymentTx(t.type, t.category, t.subcategory)) {
@@ -1680,7 +1702,7 @@
 
             if (cloudTx.length > 0) {
               transactions = cloudTx;
-              localStorage.setItem("catat_cepat_tx_v3", JSON.stringify(transactions));
+              localStorage.setItem("catat_cepat_tx_v5", JSON.stringify(transactions));
               updateDashboard();
               renderHistory();
             }
@@ -1727,8 +1749,8 @@
 
     function loadData() {
       try {
-        // Load Categories
-        const savedCategories = localStorage.getItem("catat_cepat_categories_v4");
+        // Load Categories (v5: Clean structure with user's custom categories)
+        const savedCategories = localStorage.getItem("catat_cepat_categories_v5");
         if (savedCategories) {
           categories = JSON.parse(savedCategories);
           ensurePaylaterCategories();
@@ -1737,8 +1759,8 @@
           saveCategories();
         }
 
-        // Load Wallets
-        const savedWallets = localStorage.getItem("catat_cepat_wallets_v3");
+        // Load Wallets (v5: Clean 0 initial balance)
+        const savedWallets = localStorage.getItem("catat_cepat_wallets_v5");
         if (savedWallets) {
           wallets = JSON.parse(savedWallets);
         } else {
@@ -1746,53 +1768,12 @@
           saveWallets();
         }
 
-        // Load Transactions
-        const savedTx = localStorage.getItem("catat_cepat_tx_v3");
+        // Load Transactions (v5: Clean empty array [] like brand new)
+        const savedTx = localStorage.getItem("catat_cepat_tx_v5");
         if (savedTx) {
           transactions = JSON.parse(savedTx);
         } else {
-          const today = new Date().toISOString().split('T')[0];
-          transactions = [
-            {
-              id: "tx-1",
-              timestamp: new Date().toISOString(),
-              date: today,
-              type: "Pengeluaran",
-              category: "Makanan & Jajan",
-              subcategory: "Makan Harian",
-              amount: 80000,
-              walletId: "w-cash",
-              wallet: "Uang Tunai",
-              note: "Makan siang & malam",
-              synced: true
-            },
-            {
-              id: "tx-2",
-              timestamp: new Date().toISOString(),
-              date: today,
-              type: "Pengeluaran",
-              category: "Transportasi",
-              subcategory: "Bensin Motor",
-              amount: 30000,
-              walletId: "w-cash",
-              wallet: "Uang Tunai",
-              note: "Isi bensin pertalite",
-              synced: true
-            },
-            {
-              id: "tx-3",
-              timestamp: new Date().toISOString(),
-              date: today,
-              type: "Pengeluaran",
-              category: "Kebutuhan Rumah",
-              subcategory: "Aqua Galon",
-              amount: 20000,
-              walletId: "w-cash",
-              wallet: "Uang Tunai",
-              note: "Beli 1 galon",
-              synced: false
-            }
-          ];
+          transactions = [];
           saveTransactions();
         }
 
@@ -1802,9 +1783,11 @@
           if (el) el.value = savedWebhook;
         }
 
-        const savedSnapshots = localStorage.getItem("catat_cepat_wealth_snapshots_v1");
+        const savedSnapshots = localStorage.getItem("catat_cepat_wealth_snapshots_v5");
         if (savedSnapshots) {
           customWealthSnapshots = JSON.parse(savedSnapshots);
+        } else {
+          customWealthSnapshots = [];
         }
       } catch (e) {
         console.error("Storage error:", e);
@@ -1813,7 +1796,7 @@
 
     function saveCategories() {
       try {
-        localStorage.setItem("catat_cepat_categories_v4", JSON.stringify(categories));
+        localStorage.setItem("catat_cepat_categories_v5", JSON.stringify(categories));
       } catch (e) {
         console.error("Failed saving categories", e);
       }
@@ -1821,23 +1804,90 @@
 
     function saveWallets() {
       try {
-        localStorage.setItem("catat_cepat_wallets_v3", JSON.stringify(wallets));
+        localStorage.setItem("catat_cepat_wallets_v5", JSON.stringify(wallets));
       } catch (e) {
         console.error("Failed saving wallets", e);
       }
     }
 
     
+    
+    // --- RESET SEMUA DATA SEPERTI BARU (FACTORY RESET) ---
+    async function resetAllDataLikeBrandNew() {
+      try {
+        // 1. Kosongkan transaksi lokal
+        transactions = [];
+        saveTransactions();
+
+        // 2. Reset dompet ke saldo 0
+        wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
+        saveWallets();
+
+        // 3. Reset kategori ke struktur bawaan terbaru
+        categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+        saveCategories();
+
+        // 4. Kosongkan snapshots kekayaan
+        customWealthSnapshots = [];
+        try {
+          localStorage.setItem("catat_cepat_wealth_snapshots_v5", JSON.stringify([]));
+        } catch(e) {}
+
+        // 5. Bersihkan juga penyimpanan versi lama
+        try {
+          localStorage.removeItem("catat_cepat_tx_v1");
+          localStorage.removeItem("catat_cepat_tx_v2");
+          localStorage.removeItem("catat_cepat_tx_v3");
+          localStorage.removeItem("catat_cepat_wallets_v1");
+          localStorage.removeItem("catat_cepat_wallets_v2");
+          localStorage.removeItem("catat_cepat_wallets_v3");
+          localStorage.removeItem("catat_cepat_categories_v1");
+          localStorage.removeItem("catat_cepat_categories_v2");
+          localStorage.removeItem("catat_cepat_categories_v3");
+          localStorage.removeItem("catat_cepat_categories_v4");
+        } catch(e) {}
+
+        // 6. Jika Firebase Firestore terhubung, bersihkan koleksi cloud
+        if (db && isFirebaseConnected) {
+          try {
+            const snap = await db.collection("transaksi").get();
+            const batch = db.batch();
+            snap.forEach(doc => {
+              batch.delete(doc.ref);
+            });
+            await batch.commit();
+            await syncWalletsToFirebase();
+          } catch(err) {
+            console.warn("Firestore clean error:", err);
+          }
+        }
+
+        // 7. Update UI
+        updateDashboard();
+        renderHistory();
+        renderWalletCards();
+        renderCategoryManager();
+        updateCategoryDropdowns();
+        updateWalletDropdowns();
+        renderWealthAnalytics();
+
+        showToast("Semua data berhasil di-reset seperti baru (bersih 100%)!", "success");
+      } catch (err) {
+        console.error("Reset error:", err);
+        showToast("Gagal melakukan reset data.", "error");
+      }
+    }
+
     function saveWealthSnapshots() {
       try {
-        localStorage.setItem("catat_cepat_wealth_snapshots_v1", JSON.stringify(customWealthSnapshots));
+        localStorage.setItem("catat_cepat_wealth_snapshots_v5", JSON.stringify(customWealthSnapshots));
       } catch (e) {
         console.error("Failed saving snapshots", e);
       }
     }
     function saveTransactions() {
       try {
-        localStorage.setItem("catat_cepat_tx_v3", JSON.stringify(transactions));
+        localStorage.setItem("catat_cepat_tx_v5", JSON.stringify(transactions));
       } catch (e) {
         console.error("Failed saving transactions", e);
       }
@@ -1924,7 +1974,7 @@
       const curSub = subEl ? subEl.value : '';
       const curDate = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
 
-      if (isPaylaterDebtTx(currentType, curCat, curSub)) {
+      if (currentType === 'Cicilan' || isPaylaterDebtTx(currentType, curCat, curSub)) {
         const dueInfo = calculateDueDate(curDate, curSub || curCat);
         noticeBox.className = 'mb-4 p-3.5 rounded-xl bg-purple-50/90 border border-purple-200 text-purple-950 text-xs flex items-start gap-3 shadow-xs';
         noticeBox.innerHTML = `
@@ -2850,14 +2900,13 @@
 
       let totalLiquidBalance = 0;
       let totalInvestAssets = 0;
-      let totalDebt = 0;
 
       wallets.forEach(w => {
         const bal = Number(w.balance) || 0;
         if (w.type === 'Investasi') {
           totalInvestAssets += bal;
         } else if (w.type === 'Paylater') {
-          if (bal > 0) totalDebt += bal;
+          // Akan disinkronkan dengan total akumulasi hutang di bawah
         } else {
           totalLiquidBalance += bal;
         }
@@ -2921,6 +2970,16 @@
         `;
 
         grid.appendChild(card);
+      });
+
+      // Total Paylater/Hutang dihitung langsung dari akumulasi seluruh transaksi menu Cicilan/Hutang
+      const totalDebt = getAccumulatedPaylaterDebt();
+
+      // Sinkronkan juga pada kartu dompet Paylater
+      wallets.forEach(w => {
+        if (w.type === 'Paylater' || w.name.toLowerCase().includes('paylater')) {
+          w.balance = totalDebt;
+        }
       });
 
       // Update Top Wealth & Balance Figures
@@ -3239,19 +3298,20 @@
       // Calculate current live balances
       let liveCash = 0;
       let liveInvest = 0;
-      let liveDebt = 0;
 
       wallets.forEach(w => {
         const bal = Number(w.balance) || 0;
         if (w.type === 'Investasi') {
           liveInvest += bal;
         } else if (w.type === 'Paylater') {
-          if (bal > 0) liveDebt += bal;
+          // Handled via getAccumulatedPaylaterDebt di bawah
         } else {
           liveCash += bal;
         }
       });
 
+      // Ambil langsung akumulasi hutang dari transaksi menu Cicilan/Hutang
+      const liveDebt = getAccumulatedPaylaterDebt();
       const liveNetWorth = liveCash + liveInvest - liveDebt;
 
       // Build data points depending on timeframe
@@ -4105,8 +4165,8 @@
         const isPaylaterDebt = isPaylaterDebtTx(currentType, category, subcategory);
         const isPaylaterPayment = isPaylaterPaymentTx(currentType, category, subcategory);
 
-        // ATURAN 1: Cicilan/Hutang subkategori Paylater TIDAK memotong saldo kas/bank bulan berjalan, menjadi hutang tempo 30 hari
-        if (isPaylaterDebt) {
+        // ATURAN 1: Semua transaksi dari menu Cicilan/Hutang diakumulasikan ke Paylater/Hutang & tidak mengurangi saldo kas bulan berjalan
+        if (currentType === 'Cicilan' || isPaylaterDebt) {
           const dueInfo = calculateDueDate(date, subcategory || category);
           const dueDate = dueInfo.dueDate;
           const paylaterW = wallets.find(w => w.type === 'Paylater' || w.name.toLowerCase().includes('paylater')) || targetWallet;
@@ -4123,7 +4183,7 @@
             wallet: paylaterW.name,
             isPaylaterDebt: true,
             dueDate: dueDate,
-            note: note || `Tagihan Paylater (Jatuh tempo 30 hari: ${formatShortDate(dueDate)})`,
+            note: note || `${subcategory || 'Cicilan/Hutang'} (${dueInfo.ruleText}: ${formatShortDate(dueDate)})`,
             synced: false
           };
 
@@ -4136,10 +4196,11 @@
           amtPreview.textContent = 'Rp 0';
           document.getElementById('input-note').value = '';
 
+          const totalHutang = getAccumulatedPaylaterDebt();
           if (syncImmediately) {
             syncToSheets([newTx]);
           } else {
-            showToast(`Tagihan ${subcategory || 'Paylater'} ${formatRupiah(amount)} dicatat! Saldo kas aman. Jatuh tempo: ${formatShortDate(dueDate)} (${dueInfo.ruleText})`, "success");
+            showToast(`Transaksi Cicilan/Hutang ${formatRupiah(amount)} dicatat! Total hutang kini ${formatRupiah(totalHutang)} (Jatuh tempo: ${formatShortDate(dueDate)})`, "success");
           }
           return;
         }
@@ -4569,6 +4630,31 @@
             inputInlineNewSub.value = '';
             showToast(`Subkategori "${val}" berhasil ditambahkan!`, "success");
           }
+        });
+      }
+
+      // Factory Reset Modal Listeners
+      const btnOpenFactoryReset = document.getElementById('btn-open-factory-reset-modal');
+      const btnCancelFactoryReset = document.getElementById('btn-cancel-factory-reset');
+      const btnConfirmFactoryReset = document.getElementById('btn-confirm-factory-reset');
+      const modalFactoryReset = document.getElementById('modal-factory-reset');
+
+      if (btnOpenFactoryReset) {
+        btnOpenFactoryReset.addEventListener('click', () => {
+          if (modalFactoryReset) modalFactoryReset.classList.remove('hidden');
+        });
+      }
+
+      if (btnCancelFactoryReset) {
+        btnCancelFactoryReset.addEventListener('click', () => {
+          if (modalFactoryReset) modalFactoryReset.classList.add('hidden');
+        });
+      }
+
+      if (btnConfirmFactoryReset) {
+        btnConfirmFactoryReset.addEventListener('click', async () => {
+          if (modalFactoryReset) modalFactoryReset.classList.add('hidden');
+          await resetAllDataLikeBrandNew();
         });
       }
 
