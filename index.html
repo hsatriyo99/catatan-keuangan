@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catatan Keuangan</title>
+  <title>Catatan Keuangan - Web App Perencanaan & Google Sheets</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <!-- Font Awesome Icons -->
@@ -520,9 +520,39 @@
           </div>
         </div>
 
-        <!-- Wallets Grid -->
-        <div id="wallets-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-          <!-- Dynamically populated -->
+        <!-- Filter Kategori Dompet & Ringkasan Ringkas untuk Layar HP -->
+        <div class="flex flex-col sm:flex-row gap-2 justify-between items-stretch sm:items-center pb-1">
+          <!-- Filter Kategori Tombol Geser -->
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            <button class="wallet-filter-btn active touch-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-600 text-white shadow-xs shrink-0" data-filter="ALL">
+              Semua (<span id="count-all-wallets">0</span>)
+            </button>
+            <button class="wallet-filter-btn touch-btn px-2.5 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0" data-filter="Bank">
+              Bank
+            </button>
+            <button class="wallet-filter-btn touch-btn px-2.5 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0" data-filter="E-Wallet">
+              E-Wallet
+            </button>
+            <button class="wallet-filter-btn touch-btn px-2.5 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0" data-filter="Investasi">
+              Investasi
+            </button>
+            <button class="wallet-filter-btn touch-btn px-2.5 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0" data-filter="Paylater">
+              Paylater
+            </button>
+            <button class="wallet-filter-btn touch-btn px-2.5 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0" data-filter="Tunai">
+              Tunai
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-end gap-2 text-xs text-slate-500 font-medium pt-1 sm:pt-0">
+            <span>Total Kas & Bank:</span>
+            <strong id="badge-total-liquid" class="font-extrabold text-emerald-700">Rp 0</strong>
+          </div>
+        </div>
+
+        <!-- Wallets Compact List (Desain Ringkas Nama & Saldo Hemat Ruang di Layar HP) -->
+        <div id="wallets-grid" class="space-y-2 sm:grid sm:grid-cols-2 sm:gap-2 sm:space-y-0">
+          <!-- Dynamically populated as compact list rows -->
         </div>
 
         <!-- Info Card: Net Worth Calculation -->
@@ -1762,17 +1792,9 @@
       }
     };
 
-    // Default Clean Wallets (Saldo 0 seperti baru siap diinput saldo awal)
+    // Default Clean Wallets: Hanya Uang Tunai bawaan awal, bank dan aset lainnya ditambahkan sendiri oleh user
     const DEFAULT_WALLETS = [
-      { id: "w-cash", name: "Uang Tunai", type: "Tunai", balance: 0, icon: "fa-money-bill-wave", color: "emerald" },
-      { id: "w-bca", name: "Rekening BCA", type: "Bank", balance: 0, icon: "fa-building-columns", color: "blue" },
-      { id: "w-cimb", name: "Rekening CIMB", type: "Bank", balance: 0, icon: "fa-building-columns", color: "red" },
-      { id: "w-gopay", name: "GoPay", type: "E-Wallet", balance: 0, icon: "fa-mobile-screen-button", color: "teal" },
-      { id: "w-shopee", name: "ShopeePay", type: "E-Wallet", balance: 0, icon: "fa-bag-shopping", color: "orange" },
-      { id: "w-emas", name: "Logam Mulia (Emas)", type: "Investasi", balance: 0, icon: "fa-coins", color: "amber" },
-      { id: "w-reksadana", name: "Reksa Dana (Bareksa/Makmur)", type: "Investasi", balance: 0, icon: "fa-chart-line", color: "teal" },
-      { id: "w-etf", name: "ETF SPY / Saham", type: "Investasi", balance: 0, icon: "fa-arrow-trend-up", color: "sky" },
-      { id: "w-yup", name: "Paylater Yup", type: "Paylater", balance: 0, icon: "fa-credit-card", color: "purple" }
+      { id: "w-cash", name: "Uang Tunai", type: "Tunai", balance: 0, icon: "fa-money-bill-wave", color: "emerald" }
     ];
 
     // --- State Management ---
@@ -2080,12 +2102,24 @@
           saveCategories();
         }
 
-        // Load Wallets (v5: Clean 0 initial balance)
-        const savedWallets = localStorage.getItem("catat_cepat_wallets_v5");
+        // Load Wallets (v6: Hanya Uang Tunai bawaan awal, bank dll ditambahkan sendiri oleh user)
+        const savedWallets = localStorage.getItem("catat_cepat_wallets_v6");
         if (savedWallets) {
           wallets = JSON.parse(savedWallets);
         } else {
-          wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
+          const oldV5 = localStorage.getItem("catat_cepat_wallets_v5");
+          if (oldV5) {
+            const parsed = JSON.parse(oldV5);
+            // Jika data tersimpan adalah 9 item bawaan awal lama, ganti ke bawaan baru (hanya Uang Tunai)
+            const isOldDefaultList = parsed.length === 9 && parsed.some(x => x.id === 'w-cash') && parsed.some(x => x.id === 'w-bca') && parsed.some(x => x.id === 'w-cimb');
+            if (isOldDefaultList) {
+              wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
+            } else {
+              wallets = parsed;
+            }
+          } else {
+            wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
+          }
           saveWallets();
         }
 
@@ -2125,6 +2159,7 @@
 
     function saveWallets() {
       try {
+        localStorage.setItem("catat_cepat_wallets_v6", JSON.stringify(wallets));
         localStorage.setItem("catat_cepat_wallets_v5", JSON.stringify(wallets));
       } catch (e) {
         console.error("Failed saving wallets", e);
@@ -2140,7 +2175,7 @@
         transactions = [];
         saveTransactions();
 
-        // 2. Reset dompet ke saldo 0
+        // 2. Reset dompet ke bawaan awal (hanya Uang Tunai saldo Rp 0)
         wallets = JSON.parse(JSON.stringify(DEFAULT_WALLETS));
         saveWallets();
 
@@ -3210,7 +3245,23 @@
       }
     }
 
-    // --- Render Wallets Grid Cards in Tab ---
+    // --- State Filter untuk Tab Daftar Dompet ---
+    let activeWalletTabFilter = 'ALL';
+
+    function setWalletTabFilter(filterType) {
+      activeWalletTabFilter = filterType;
+      document.querySelectorAll('.wallet-filter-btn').forEach(btn => {
+        const btnFilter = btn.getAttribute('data-filter');
+        if (btnFilter === filterType) {
+          btn.className = 'wallet-filter-btn active touch-btn px-3 py-1.5 rounded-xl text-xs font-bold transition bg-emerald-600 text-white shadow-xs shrink-0';
+        } else {
+          btn.className = 'wallet-filter-btn touch-btn px-2.5 py-1.5 rounded-xl text-xs font-semibold transition bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0';
+        }
+      });
+      renderWalletCards();
+    }
+
+    // --- Render Wallets List in Tab (Ringkas & Mobile-First) ---
     function renderWalletCards() {
       const grid = document.getElementById('wallets-grid');
       const topPills = document.getElementById('top-wallets-pills');
@@ -3219,21 +3270,29 @@
       grid.innerHTML = '';
       if (topPills) topPills.innerHTML = '';
 
+      // Total Paylater/Hutang dihitung langsung dari akumulasi seluruh transaksi menu Cicilan/Hutang
+      const totalDebt = getAccumulatedPaylaterDebt();
+
+      // Sinkronkan juga pada kartu dompet Paylater sebelum perulangan
+      wallets.forEach(w => {
+        if (w.type === 'Paylater' || w.name.toLowerCase().includes('paylater')) {
+          w.balance = totalDebt;
+        }
+      });
+
       let totalLiquidBalance = 0;
       let totalInvestAssets = 0;
 
+      // Update counters & totals
       wallets.forEach(w => {
         const bal = Number(w.balance) || 0;
         if (w.type === 'Investasi') {
           totalInvestAssets += bal;
         } else if (w.type === 'Paylater') {
-          // Akan disinkronkan dengan total akumulasi hutang di bawah
+          // Hutang Paylater
         } else {
           totalLiquidBalance += bal;
         }
-
-        const colors = getWalletColorClasses(w.type);
-        const icon = getWalletTypeIcon(w.type);
 
         // Top Pill item with brand logo to the left
         if (topPills) {
@@ -3247,61 +3306,82 @@
           pill.addEventListener('click', () => switchTab('tab-wallets'));
           topPills.appendChild(pill);
         }
+      });
 
-        // Full Wallet Card in Tab
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-xl p-4 border border-slate-200 hover:border-emerald-300 hover:shadow-md transition flex flex-col justify-between';
-        
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-2.5">
-                ${getWalletLogoHtml(w.name, w.type, 'md')}
-                <div>
-                  <h4 class="font-bold text-slate-800 text-xs sm:text-sm leading-tight flex items-center gap-1.5">
+      // Filter wallets sesuai tab filter aktif
+      const filteredWallets = wallets.filter(w => {
+        if (activeWalletTabFilter === 'ALL') return true;
+        return w.type === activeWalletTabFilter;
+      });
+
+      const countBadge = document.getElementById('count-all-wallets');
+      if (countBadge) countBadge.textContent = wallets.length;
+      const liquidBadge = document.getElementById('badge-total-liquid');
+      if (liquidBadge) liquidBadge.textContent = formatRupiah(totalLiquidBalance);
+
+      if (filteredWallets.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-8 text-center text-slate-400 bg-slate-50/60 rounded-xl border border-dashed border-slate-200">
+            <i class="fa-solid fa-wallet text-2xl mb-1.5 block text-slate-300"></i>
+            <span class="text-xs font-medium">Tidak ada dompet dalam kategori "${activeWalletTabFilter}".</span>
+          </div>
+        `;
+      } else {
+        filteredWallets.forEach(w => {
+          const colors = getWalletColorClasses(w.type);
+
+          // Desain List Horizontal Ringkas: Logo + Nama + Tipe di kiri, Saldo + Aksi Cepat di kanan
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-slate-200 hover:border-emerald-300 bg-white hover:bg-slate-50/80 transition shadow-2xs group';
+          
+          item.innerHTML = `
+            <!-- Kiri: Logo + Nama & Tipe Dompet -->
+            <div class="flex items-center gap-2.5 min-w-0 pr-2">
+              ${getWalletLogoHtml(w.name, w.type, 'md')}
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="font-bold text-slate-900 text-xs sm:text-sm leading-tight truncate">
                     ${w.name}
                   </h4>
-                  <span class="text-[10px] ${colors.text} font-semibold uppercase tracking-wider">${w.type}</span>
+                  <span class="text-[9px] px-1.5 py-0.2 rounded font-semibold uppercase tracking-wider ${colors.bg} ${colors.text} shrink-0">
+                    ${w.type}
+                  </span>
                 </div>
+                <span class="text-[10px] text-slate-400 block truncate mt-0.5">
+                  ${w.type === 'Investasi' ? 'Aset Investasi' : (w.type === 'Paylater' ? 'Akumulasi Hutang (Tempo 30 Hari)' : 'Saldo Kas/Bank')}
+                </span>
+              </div>
+            </div>
+
+            <!-- Kanan: Nominal Saldo + Tombol Aksi Cepat -->
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              <div class="text-right">
+                <div class="text-xs sm:text-sm font-black ${w.balance < 0 ? 'text-rose-600' : (w.type === 'Paylater' ? 'text-purple-700' : 'text-slate-900')} tracking-tight">
+                  ${formatRupiah(w.balance)}
+                </div>
+                <span class="text-[9px] text-slate-400 block font-medium">
+                  ${w.type === 'Paylater' ? 'Hutang aktif' : 'Tersedia'}
+                </span>
               </div>
 
-              <div class="flex items-center gap-1">
-                <button class="btn-edit-wallet touch-btn w-7 h-7 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 flex items-center justify-center transition" data-id="${w.id}" title="Edit Dompet">
+              <!-- Tombol Aksi Icon Cepat (Sliders untuk Ubah Saldo, Pen untuk Edit, Trash untuk Hapus) -->
+              <div class="flex items-center gap-0.5 border-l border-slate-100 pl-1.5 sm:pl-2">
+                <button class="btn-adjust-balance touch-btn w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 flex items-center justify-center transition" data-id="${w.id}" title="Sesuaikan Saldo">
+                  <i class="fa-solid fa-sliders text-xs"></i>
+                </button>
+                <button class="btn-edit-wallet touch-btn w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 flex items-center justify-center transition" data-id="${w.id}" title="Edit Nama & Jenis Dompet">
                   <i class="fa-regular fa-pen-to-square text-xs"></i>
                 </button>
-                <button class="btn-delete-wallet touch-btn w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition" data-id="${w.id}" title="Hapus Dompet">
+                <button class="btn-delete-wallet touch-btn w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition" data-id="${w.id}" title="Hapus Dompet">
                   <i class="fa-regular fa-trash-can text-xs"></i>
                 </button>
               </div>
             </div>
+          `;
 
-            <div class="mt-3 pt-2 border-t border-slate-100">
-              <span class="text-[10px] font-semibold uppercase tracking-wider block mb-0.5 ${w.type === 'Paylater' ? 'text-purple-600' : 'text-slate-400'}">${w.type === 'Investasi' ? 'Nilai Aset / Portofolio' : (w.type === 'Paylater' ? 'Akumulasi Hutang Paylater (Tempo 30 Hari)' : 'Saldo Tersedia')}</span>
-              <div class="text-lg font-extrabold ${w.balance < 0 ? 'text-rose-600' : 'text-slate-900'} tracking-tight">
-                ${formatRupiah(w.balance)}
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-3 pt-2.5 flex gap-1.5 border-t border-slate-100 text-[11px]">
-            <button class="btn-adjust-balance touch-btn flex-1 py-1.5 px-2 rounded-lg bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 font-semibold border border-slate-200 transition text-center" data-id="${w.id}">
-              <i class="fa-solid fa-sliders text-emerald-600 mr-1"></i> Sesuaikan Saldo
-            </button>
-          </div>
-        `;
-
-        grid.appendChild(card);
-      });
-
-      // Total Paylater/Hutang dihitung langsung dari akumulasi seluruh transaksi menu Cicilan/Hutang
-      const totalDebt = getAccumulatedPaylaterDebt();
-
-      // Sinkronkan juga pada kartu dompet Paylater
-      wallets.forEach(w => {
-        if (w.type === 'Paylater' || w.name.toLowerCase().includes('paylater')) {
-          w.balance = totalDebt;
-        }
-      });
+          grid.appendChild(item);
+        });
+      }
 
       // Update Top Wealth & Balance Figures
       const totalNetWorth = totalLiquidBalance + totalInvestAssets - totalDebt;
@@ -3317,22 +3397,25 @@
       if (debtEl) debtEl.textContent = formatRupiah(totalDebt);
 
       // Bind edit and delete handlers
-      document.querySelectorAll('.btn-edit-wallet').forEach(b => {
+      grid.querySelectorAll('.btn-edit-wallet').forEach(b => {
         b.addEventListener('click', (e) => {
+          e.stopPropagation();
           const id = e.currentTarget.getAttribute('data-id');
           openWalletModal(id);
         });
       });
 
-      document.querySelectorAll('.btn-delete-wallet').forEach(b => {
+      grid.querySelectorAll('.btn-delete-wallet').forEach(b => {
         b.addEventListener('click', (e) => {
+          e.stopPropagation();
           const id = e.currentTarget.getAttribute('data-id');
           openDeleteWalletModal(id);
         });
       });
 
-      document.querySelectorAll('.btn-adjust-balance').forEach(b => {
+      grid.querySelectorAll('.btn-adjust-balance').forEach(b => {
         b.addEventListener('click', (e) => {
+          e.stopPropagation();
           const id = e.currentTarget.getAttribute('data-id');
           openWalletModal(id, true);
         });
@@ -5464,6 +5547,14 @@
           renderWalletPickerList(e.target.value);
         });
       }
+
+      // Wallet Tab Filter Buttons
+      document.querySelectorAll('.wallet-filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const filter = e.currentTarget.getAttribute('data-filter');
+          setWalletTabFilter(filter);
+        });
+      });
 
       const btnTrigCat = document.getElementById('btn-trigger-category-picker');
       const btnTrigSub = document.getElementById('btn-trigger-subcategory-picker');
