@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catatan Keuangan - Web App Perencanaan & Google Sheets</title>
+  <title>Catatan Keuangan</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <!-- Font Awesome Icons -->
@@ -117,8 +117,8 @@
             <span class="bg-amber-500/20 text-amber-200 border border-amber-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5 backdrop-blur-xs">
               <i class="fa-solid fa-chart-line text-[10px]"></i> Aset & Investasi: <strong id="disp-total-invest-assets">Rp 0</strong>
             </span>
-            <span id="badge-debt-container" class="bg-purple-500/20 text-purple-200 border border-purple-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5 backdrop-blur-xs">
-              <i class="fa-solid fa-credit-card text-[10px]"></i> Paylater/Hutang: <strong id="disp-total-debt">Rp 0</strong>
+            <span id="badge-debt-container" class="bg-purple-500/20 text-purple-200 border border-purple-500/30 px-2.5 py-1 rounded-lg flex items-center gap-1.5 backdrop-blur-xs cursor-pointer hover:bg-purple-500/30 transition" title="Klik untuk Monitor & Bayar Paylater">
+              <i class="fa-solid fa-credit-card text-[10px]"></i> Paylater/Hutang: <strong id="disp-total-debt">Rp 0</strong> &rarr;
             </span>
           </div>
         </div>
@@ -176,6 +176,9 @@
       </button>
       <button class="nav-tab pb-3 px-3 text-sm font-semibold text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-2 transition" data-tab="tab-history">
         <i class="fa-solid fa-list-check"></i> Riwayat Transaksi
+      </button>
+      <button class="nav-tab pb-3 px-3 text-sm font-semibold text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-2 transition" data-tab="tab-paylater">
+        <i class="fa-solid fa-credit-card text-purple-600"></i> Monitor Paylater
       </button>
       <button class="nav-tab pb-3 px-3 text-sm font-semibold text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-2 transition" data-tab="tab-analysis">
         <i class="fa-solid fa-chart-pie"></i> Analisis & Grafik
@@ -596,6 +599,119 @@
     </div>
 
     <!-- ============================================== -->
+        <!-- ============================================== -->
+    <!-- TAB: MONITOR PAYLATER & PELUNASAN (NEW) -->
+    <!-- ============================================== -->
+    <div id="tab-paylater" class="tab-content hidden space-y-5">
+      <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200 space-y-6">
+        
+        <!-- Header & Quick Pay Button -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-200">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-credit-card text-purple-600 text-lg"></i>
+                Monitor & Pelunasan Paylater
+              </h2>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Pantau akumulasi tagihan Kredivo, Shopee Paylater, YUP, dan lakukan pembayaran langsung yang tercatat sebagai Pengeluaran.</p>
+          </div>
+          <button id="btn-open-paylater-payment-modal" class="touch-btn w-full sm:w-auto px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-purple-600/20 transition">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Bayar Tagihan Paylater</span>
+          </button>
+        </div>
+
+        <!-- Provider Summary Cards (Kredivo, Shopee Paylater, YUP, Total) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <!-- Card Total Hutang Aktif -->
+          <div class="p-4 rounded-xl bg-gradient-to-br from-purple-900 to-indigo-950 text-white flex flex-col justify-between">
+            <span class="text-[11px] font-semibold text-purple-200 uppercase tracking-wider block mb-1">Total Hutang Paylater</span>
+            <div class="text-xl sm:text-2xl font-black text-white" id="monitor-total-debt-val">Rp 0</div>
+            <span class="text-[10px] text-purple-300 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-clock text-[9px]"></i> Akumulasi semua tagihan
+            </span>
+          </div>
+
+          <!-- Card Kredivo -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[11px] font-bold text-slate-700">Kredivo</span>
+              <span class="text-[10px] bg-orange-100 text-orange-800 font-bold px-1.5 py-0.2 rounded">Tempo 30 Hari</span>
+            </div>
+            <div class="text-base sm:text-lg font-extrabold text-orange-600" id="monitor-kredivo-debt">Rp 0</div>
+            <span class="text-[10px] text-slate-400 mt-1" id="monitor-kredivo-count">0 transaksi aktif</span>
+          </div>
+
+          <!-- Card Shopee Paylater -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[11px] font-bold text-slate-700">Shopee Paylater</span>
+              <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.2 rounded">Tempo tgl 25</span>
+            </div>
+            <div class="text-base sm:text-lg font-extrabold text-amber-600" id="monitor-shopee-debt">Rp 0</div>
+            <span class="text-[10px] text-slate-400 mt-1" id="monitor-shopee-count">0 transaksi aktif</span>
+          </div>
+
+          <!-- Card YUP Paylater -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[11px] font-bold text-slate-700">YUP Paylater</span>
+              <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded">Tempo tgl 25</span>
+            </div>
+            <div class="text-base sm:text-lg font-extrabold text-purple-600" id="monitor-yup-debt">Rp 0</div>
+            <span class="text-[10px] text-slate-400 mt-1" id="monitor-yup-count">0 transaksi aktif</span>
+          </div>
+        </div>
+
+        <!-- Info Banner Alur Pembayaran -->
+        <div class="p-3.5 rounded-xl bg-purple-50/70 border border-purple-200 text-xs text-purple-950 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 text-sm mt-0.5">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <div class="leading-relaxed">
+            <strong class="font-bold text-purple-950 block mb-0.5">Cara Kerja Pembayaran Paylater:</strong>
+            Saat Anda menekan tombol <strong>Bayar Tagihan Paylater</strong>, pembayaran akan memotong saldo rekening/kas Anda dan otomatis <u>mengurangi jumlah akumulasi hutang</u> di atas. Transaksi pembayaran tersebut akan langsung tercatat sebagai <strong>Pengeluaran</strong> pada pos <em>Pinjaman & Paylater</em>.
+          </div>
+        </div>
+
+        <!-- Filter & Search Paylater History -->
+        <div class="pt-2">
+          <div class="flex flex-col sm:flex-row gap-2.5 justify-between items-stretch sm:items-center mb-3">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-list text-purple-600"></i>
+              Riwayat Transaksi & Pelunasan Paylater
+            </h3>
+            <div class="flex gap-2">
+              <select id="filter-paylater-provider" class="py-1.5 px-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 font-medium focus:outline-none">
+                <option value="ALL">Semua Penyedia</option>
+                <option value="kredivo">Kredivo</option>
+                <option value="shopee">Shopee Paylater</option>
+                <option value="yup">YUP</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- List Container for Paylater Transactions -->
+          <div id="paylater-transaction-list" class="space-y-2.5">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="empty-paylater-history" class="hidden py-10 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <p class="font-semibold text-slate-700 text-xs">Belum ada riwayat transaksi Paylater</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Transaksi belanja menggunakan Paylater akan otomatis terpantau di sini.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================== -->
     <!-- TAB 3: ANALISIS & GRAFIK (KEKAYAAN & PENGELUARAN) -->
     <!-- ============================================== -->
     <div id="tab-analysis" class="tab-content hidden space-y-5">
@@ -1005,6 +1121,10 @@
       <i class="fa-solid fa-list-check text-base"></i>
       <span class="text-[9px] font-medium mt-0.5">Riwayat</span>
     </button>
+    <button class="mobile-nav-btn flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 transition" data-tab="tab-paylater">
+      <i class="fa-solid fa-credit-card text-base"></i>
+      <span class="text-[9px] font-medium mt-0.5">Paylater</span>
+    </button>
     <button class="mobile-nav-btn flex flex-col items-center py-1 px-1.5 text-slate-400 hover:text-slate-600 transition" data-tab="tab-analysis">
       <i class="fa-solid fa-chart-pie text-base"></i>
       <span class="text-[9px] font-medium mt-0.5">Grafik</span>
@@ -1345,6 +1465,187 @@
     </div>
   </div>
 
+    <!-- ============================================== -->
+  <!-- MODAL POPUP: EDIT TRANSAKSI -->
+  <!-- ============================================== -->
+  <div id="modal-edit-tx-container" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white rounded-t-3xl sm:rounded-t-2xl">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shadow-xs">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base">Edit Transaksi</h3>
+            <p class="text-[11px] text-slate-500" id="edit-tx-type-badge">Perbarui data transaksi Anda</p>
+          </div>
+        </div>
+        <button id="btn-close-edit-tx" class="touch-btn w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-5 overflow-y-auto no-scrollbar space-y-4 flex-1">
+        <input type="hidden" id="edit-tx-id" value="">
+
+        <!-- Nominal -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="edit-tx-amount" class="text-xs font-bold text-slate-600 uppercase tracking-wider">Nominal (Rp)</label>
+            <span id="edit-tx-amount-preview" class="text-xs font-bold text-emerald-600">Rp 0</span>
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold text-xs">
+              Rp
+            </div>
+            <input type="text" id="edit-tx-amount" inputmode="numeric" placeholder="0" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+        </div>
+
+        <!-- Tanggal -->
+        <div>
+          <label for="edit-tx-date" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tanggal</label>
+          <input type="date" id="edit-tx-date" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <!-- Dompet / Sumber Dana -->
+        <div id="container-edit-tx-wallet">
+          <label for="edit-tx-select-wallet" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Dompet / Rekening</label>
+          <select id="edit-tx-select-wallet" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+
+        <!-- Kategori & Subkategori (jika bukan Transfer) -->
+        <div id="container-edit-tx-categories" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="edit-tx-select-category" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Kategori</label>
+            <select id="edit-tx-select-category" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+          <div>
+            <label for="edit-tx-select-subcategory" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Subkategori</label>
+            <select id="edit-tx-select-subcategory" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Catatan -->
+        <div>
+          <label for="edit-tx-note" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Catatan</label>
+          <input type="text" id="edit-tx-note" placeholder="Keterangan transaksi..." class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        </div>
+
+        <!-- Info Rollback Otomatis -->
+        <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900 flex items-start gap-2">
+          <i class="fa-solid fa-circle-info text-amber-600 mt-0.5 shrink-0"></i>
+          <span>Perubahan nominal atau dompet akan otomatis menyesuaikan ulang (*recalculate*) saldo dompet dan hutang terkait secara akurat.</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2">
+        <button id="btn-cancel-edit-tx" class="touch-btn flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">Batal</button>
+        <button id="btn-save-edit-tx" class="touch-btn flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          <i class="fa-solid fa-check"></i>
+          <span>Simpan Perubahan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <!-- ============================================== -->
+  <!-- MODAL POPUP: PEMBAYARAN TAGIHAN PAYLATER -->
+  <!-- ============================================== -->
+  <div id="modal-paylater-payment-container" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white rounded-t-3xl sm:rounded-t-2xl">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-sm shadow-xs">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base">Bayar Tagihan Paylater</h3>
+            <p class="text-[11px] text-slate-500">Tercatat sebagai Pengeluaran & mengurangi hutang</p>
+          </div>
+        </div>
+        <button id="btn-close-paylater-payment" class="touch-btn w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-4 sm:p-5 overflow-y-auto no-scrollbar space-y-4 flex-1">
+        
+        <!-- Pilih Penyedia yang Dibayar -->
+        <div>
+          <label for="pay-paylater-provider" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tagihan yang Dibayar</label>
+          <select id="pay-paylater-provider" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="SPaylater">Shopee Paylater (SPaylater)</option>
+            <option value="Kredivo">Kredivo</option>
+            <option value="YUP">YUP Paylater</option>
+            <option value="Bayar Paylater">Semua / Paylater Lainnya</option>
+          </select>
+        </div>
+
+        <!-- Nominal Pembayaran -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="pay-paylater-amount" class="text-xs font-bold text-slate-600 uppercase tracking-wider">Nominal Pembayaran (Rp)</label>
+            <span id="pay-paylater-amount-preview" class="text-xs font-bold text-purple-600">Rp 0</span>
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 font-bold text-xs">
+              Rp
+            </div>
+            <input type="text" id="pay-paylater-amount" inputmode="numeric" placeholder="0" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          <div class="flex gap-1.5 mt-2">
+            <button type="button" class="btn-quick-pay-amt touch-btn px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200" data-amt="50000">+50 rb</button>
+            <button type="button" class="btn-quick-pay-amt touch-btn px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200" data-amt="100000">+100 rb</button>
+            <button type="button" class="btn-quick-pay-amt touch-btn px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-slate-100 hover:bg-purple-50 hover:text-purple-700 text-slate-700 border border-slate-200" data-amt="500000">+500 rb</button>
+            <button type="button" id="btn-pay-all-debt" class="touch-btn px-2.5 py-1 text-[11px] font-bold rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 ml-auto">Bayar Penuh</button>
+          </div>
+        </div>
+
+        <!-- Rekening Sumber Pembayaran (Kas/Bank) -->
+        <div>
+          <label for="pay-paylater-wallet" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Bayar Menggunakan (Dompet Sumber)</label>
+          <select id="pay-paylater-wallet" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <!-- Populated via JS -->
+          </select>
+          <p class="text-[10px] text-slate-500 mt-1">Saldo rekening yang dipilih akan berkurang sebesar nominal di atas.</p>
+        </div>
+
+        <!-- Tanggal Pembayaran -->
+        <div>
+          <label for="pay-paylater-date" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Tanggal Pembayaran</label>
+          <input type="date" id="pay-paylater-date" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Catatan -->
+        <div>
+          <label for="pay-paylater-note" class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">Catatan Tambahan (Opsional)</label>
+          <input type="text" id="pay-paylater-note" placeholder="Misal: Pelunasan tagihan SPaylater bulan ini" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex gap-2">
+        <button id="btn-cancel-paylater-payment" class="touch-btn flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition">Batal</button>
+        <button id="btn-submit-paylater-payment" class="touch-btn flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs">
+          <i class="fa-solid fa-check"></i>
+          <span>Konfirmasi Pembayaran</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Hapus Transaksi Confirmation -->
   <div id="modal-container" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
@@ -1498,17 +1799,12 @@
     // Ensure Paylater and Bayar Paylater exist in categories
     function ensurePaylaterCategories() {
       if (!categories.Cicilan) categories.Cicilan = {};
-      if (!categories.Cicilan["Paylater & FinTech"]) {
-        categories.Cicilan["Paylater & FinTech"] = ["Paylater", "Paylater Yup", "Paylater Kredivo", "Indodana", "ShopeePay Paylater", "Kartu Kredit"];
-      } else if (!categories.Cicilan["Paylater & FinTech"].includes("Paylater")) {
-        categories.Cicilan["Paylater & FinTech"].unshift("Paylater");
+      if (!categories.Cicilan["Penyedia Paylater"]) {
+        categories.Cicilan["Penyedia Paylater"] = ["Kredivo Paylater", "Shopee Paylater", "YUP Paylater"];
       }
-
       if (!categories.Pengeluaran) categories.Pengeluaran = {};
-      if (!categories.Pengeluaran["Pembayaran Tagihan & Hutang"]) {
-        categories.Pengeluaran["Pembayaran Tagihan & Hutang"] = ["Bayar Paylater", "Bayar Kartu Kredit", "Bayar Cicilan Lainnya"];
-      } else if (!categories.Pengeluaran["Pembayaran Tagihan & Hutang"].includes("Bayar Paylater")) {
-        categories.Pengeluaran["Pembayaran Tagihan & Hutang"].unshift("Bayar Paylater");
+      if (!categories.Pengeluaran["Pinjaman & Paylater"]) {
+        categories.Pengeluaran["Pinjaman & Paylater"] = ["Cicilan Rumah", "Cicilan Mobil", "Cicilan Motor", "Kredivo", "SPaylater", "YUP"];
       }
     }
 
@@ -1574,38 +1870,63 @@
       }
     }
 
-        function isPaylaterDebtTx(type, category, subcategory) {
-      // Semua transaksi dari menu Cicilan/Hutang atau yang mengandung unsur paylater/hutang/cicilan
-      if (type === 'Cicilan' || type === 'Paylater' || type === 'Hutang') return true;
-      const sub = (subcategory || '').toLowerCase();
-      const cat = (category || '').toLowerCase();
-      return cat.includes('paylater') || sub.includes('paylater') || 
-             cat.includes('cicil') || sub.includes('cicil') ||
-             cat.includes('pinjam') || sub.includes('pinjam') ||
-             cat.includes('hutang') || sub.includes('hutang') ||
-             sub.includes('kredivo') || sub.includes('shopee') || sub.includes('spaylater') || sub.includes('yup');
-    }
-
-    function isPaylaterPaymentTx(type, category, subcategory) {
+    function isPaylaterPaymentTx(type, category, subcategory, t = null) {
+      if (t && t.isPaylaterPayment) return true;
       if (type !== 'Pengeluaran') return false;
       const sub = (subcategory || '').toLowerCase();
       const cat = (category || '').toLowerCase();
+      const note = (t && t.note ? t.note : '').toLowerCase();
 
       // Transaksi pengeluaran untuk pelunasan hutang / cicilan / paylater
       if (cat.includes('paylater') || cat.includes('pinjaman') || cat.includes('hutang') || cat.includes('cicilan')) {
         return true;
       }
-      return sub.includes('bayar') || sub.includes('lunas') || sub.includes('kredivo') || sub.includes('spaylater') || sub.includes('shopee') || sub.includes('yup') || sub.includes('paylater');
+      return sub.includes('bayar') || sub.includes('lunas') || sub.includes('kredivo') || 
+             sub.includes('spaylater') || sub.includes('shopee') || sub.includes('yup') || 
+             sub.includes('paylater') || note.includes('bayar paylater') || note.includes('pelunasan');
+    }
+
+    function isPaylaterDebtTx(type, category, subcategory, t = null) {
+      // Pembayaran paylater tidak pernah berupa hutang baru
+      if (t && t.isPaylaterPayment) return false;
+      // Transaksi jenis Pengeluaran, Pemasukan, Transfer, Investasi bukan hutang baru
+      if (type === 'Pengeluaran' || type === 'Pemasukan' || type === 'Transfer' || type === 'Investasi') {
+        return false;
+      }
+      // Hutang baru berasal dari menu Cicilan / Paylater / Hutang
+      if (type === 'Cicilan' || type === 'Paylater' || type === 'Hutang' || (t && t.isPaylaterDebt)) {
+        return true;
+      }
+      const sub = (subcategory || '').toLowerCase();
+      const cat = (category || '').toLowerCase();
+      return (cat.includes('paylater') || sub.includes('paylater') || 
+             cat.includes('cicil') || sub.includes('cicil') ||
+             cat.includes('pinjam') || sub.includes('pinjam') ||
+             cat.includes('hutang') || sub.includes('hutang') ||
+             sub.includes('kredivo') || sub.includes('shopee') || sub.includes('spaylater') || sub.includes('yup')) && type !== 'Pengeluaran';
+    }
+
+    function getTxPaylaterStatus(t) {
+      if (!t) return 'NONE';
+      // 1. Prioritaskan pengecekan pembayaran/pelunasan terlebih dahulu
+      if (t.isPaylaterPayment || isPaylaterPaymentTx(t.type, t.category, t.subcategory, t)) {
+        return 'PAYMENT';
+      }
+      // 2. Transaksi cicilan / penambahan hutang baru
+      if (t.isPaylaterDebt || isPaylaterDebtTx(t.type, t.category, t.subcategory, t)) {
+        return 'DEBT';
+      }
+      return 'NONE';
     }
 
     function getAccumulatedPaylaterDebt() {
       let debt = 0;
       transactions.forEach(t => {
         const amt = Number(t.amount) || 0;
-        // Akumulasi dari semua transaksi menu Cicilan/Hutang
-        if (t.isPaylaterDebt || isPaylaterDebtTx(t.type, t.category, t.subcategory)) {
+        const status = getTxPaylaterStatus(t);
+        if (status === 'DEBT') {
           debt += amt;
-        } else if (t.isPaylaterPayment || isPaylaterPaymentTx(t.type, t.category, t.subcategory)) {
+        } else if (status === 'PAYMENT') {
           debt -= amt;
         }
       });
@@ -1974,7 +2295,20 @@
       const curSub = subEl ? subEl.value : '';
       const curDate = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
 
-      if (currentType === 'Cicilan' || isPaylaterDebtTx(currentType, curCat, curSub)) {
+      if (isPaylaterPaymentTx(currentType, curCat, curSub)) {
+        const currentDebt = getAccumulatedPaylaterDebt();
+        noticeBox.className = 'mb-4 p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-emerald-950 text-xs flex items-start gap-3 shadow-xs';
+        noticeBox.innerHTML = `
+          <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <div class="leading-relaxed">
+            <strong class="font-bold text-emerald-950 block mb-0.5">Alur Pelunasan Paylater (${curSub || 'Paylater'}):</strong>
+            Transaksi ini akan <span class="underline font-bold text-emerald-800">memotong saldo dompet</span> yang dipilih dan <span class="underline font-bold text-emerald-800">mengurangi akumulasi jumlah Hutang Paylater</span> tercatat. (Total hutang tercatat saat ini: <strong>${formatRupiah(currentDebt)}</strong>).
+          </div>
+        `;
+        noticeBox.classList.remove('hidden');
+      } else if (currentType === 'Cicilan' || isPaylaterDebtTx(currentType, curCat, curSub)) {
         const dueInfo = calculateDueDate(curDate, curSub || curCat);
         noticeBox.className = 'mb-4 p-3.5 rounded-xl bg-purple-50/90 border border-purple-200 text-purple-950 text-xs flex items-start gap-3 shadow-xs';
         noticeBox.innerHTML = `
@@ -1989,19 +2323,6 @@
             <div class="mt-1 text-slate-700">
               Transaksi ini <span class="underline font-bold text-purple-800">TIDAK mengurangi saldo kas/bank bulan berjalan</span>. Dicatat sebagai Hutang yang harus dibayar pada: <strong>${formatShortDate(dueInfo.dueDate)}</strong>. Total hutang Paylater akan bertambah secara akumulatif.
             </div>
-          </div>
-        `;
-        noticeBox.classList.remove('hidden');
-      } else if (isPaylaterPaymentTx(currentType, curCat, curSub)) {
-        const currentDebt = getAccumulatedPaylaterDebt();
-        noticeBox.className = 'mb-4 p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-emerald-950 text-xs flex items-start gap-3 shadow-xs';
-        noticeBox.innerHTML = `
-          <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs">
-            <i class="fa-solid fa-receipt"></i>
-          </div>
-          <div class="leading-relaxed">
-            <strong class="font-bold text-emerald-950 block mb-0.5">Alur Pelunasan Paylater (${curSub}):</strong>
-            Transaksi ini akan <span class="underline font-bold text-emerald-800">memotong saldo dompet</span> yang dipilih dan <span class="underline font-bold text-emerald-800">mengurangi akumulasi jumlah Hutang Paylater</span> tercatat. (Total hutang tercatat saat ini: <strong>${formatRupiah(currentDebt)}</strong>).
           </div>
         `;
         noticeBox.classList.remove('hidden');
@@ -3124,7 +3445,8 @@
         if (!t.synced) pendingCount++;
 
         const amt = Number(t.amount) || 0;
-        const isPLDebt = t.isPaylaterDebt || isPaylaterDebtTx(t.type, t.category, t.subcategory);
+        const plStatus = getTxPaylaterStatus(t);
+        const isPLDebt = plStatus === 'DEBT';
 
         // Transaksi Paylater hutang tidak memotong saldo kas bulan berjalan,
         // pengeluaran kas riil terjadi saat transaksi Pengeluaran (termasuk Bayar Paylater)
@@ -3187,19 +3509,78 @@
       }
       emptyEl.classList.add('hidden');
 
+      // Group transactions by date
       const sorted = [...filtered].sort((a, b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
 
+      // Grouping map: { 'YYYY-MM-DD': [ tx1, tx2 ] }
+      const groups = {};
       sorted.forEach(t => {
-        const item = document.createElement('div');
-        item.className = 'flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-slate-50/70 hover:bg-slate-50 transition group';
+        const d = t.date || (t.timestamp ? t.timestamp.split('T')[0] : 'Hari ini');
+        if (!groups[d]) groups[d] = [];
+        groups[d].push(t);
+      });
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const yesterdayDate = new Date();
+      yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+      const yesterdayStr = yesterdayDate.toISOString().split('T')[0];
+
+      Object.keys(groups).forEach(dateKey => {
+        const txsInDate = groups[dateKey];
+
+        // Calculate daily expense and income
+        let dailyExpense = 0;
+        let dailyIncome = 0;
+        txsInDate.forEach(t => {
+          const amt = Number(t.amount) || 0;
+          if (t.type === 'Pengeluaran') dailyExpense += amt;
+          else if (t.type === 'Pemasukan') dailyIncome += amt;
+        });
+
+        // Determine human readable label
+        let displayDateTitle = formatShortDate(dateKey);
+        if (dateKey === todayStr) {
+          displayDateTitle = `Hari Ini • ${displayDateTitle}`;
+        } else if (dateKey === yesterdayStr) {
+          displayDateTitle = `Kemarin • ${displayDateTitle}`;
+        }
+
+        // Create Date Group Container
+        const groupContainer = document.createElement('div');
+        groupContainer.className = 'space-y-2 mb-4';
+
+        // Date Header Banner
+        const dateHeader = document.createElement('div');
+        dateHeader.className = 'flex items-center justify-between px-2 py-1.5 bg-slate-100/80 rounded-xl text-xs border border-slate-200/60 sticky top-16 z-10 backdrop-blur-xs';
+        dateHeader.innerHTML = `
+          <div class="flex items-center gap-1.5 font-bold text-slate-800">
+            <i class="fa-regular fa-calendar text-emerald-600"></i>
+            <span>${displayDateTitle}</span>
+            <span class="text-[10px] bg-white border border-slate-200 text-slate-500 font-semibold px-1.5 py-0.2 rounded-full">${txsInDate.length} transaksi</span>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] font-bold">
+            ${dailyExpense > 0 ? `<span class="text-rose-600">Keluar: -${formatRupiah(dailyExpense)}</span>` : ''}
+            ${dailyIncome > 0 ? `<span class="text-emerald-600">Masuk: +${formatRupiah(dailyIncome)}</span>` : ''}
+          </div>
+        `;
+        groupContainer.appendChild(dateHeader);
+
+        // Transaction items inside this date group
+        const itemsWrapper = document.createElement('div');
+        itemsWrapper.className = 'space-y-2';
+
+        txsInDate.forEach(t => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between p-3.5 rounded-xl border border-slate-100 hover:border-slate-200 bg-white hover:bg-slate-50/70 transition shadow-2xs group';
         
         let typeBadgeColor = 'bg-rose-100 text-rose-700';
         let typeIcon = 'fa-arrow-trend-down';
         let amountPrefix = '- ';
         let amountColor = 'text-slate-900 font-extrabold';
 
-        const isPLDebt = t.isPaylaterDebt || isPaylaterDebtTx(t.type, t.category, t.subcategory);
-        const isPLPay = t.isPaylaterPayment || isPaylaterPaymentTx(t.type, t.category, t.subcategory);
+        const plStatus = getTxPaylaterStatus(t);
+        const isPLDebt = plStatus === 'DEBT';
+        const isPLPay = plStatus === 'PAYMENT';
 
         if (isPLDebt) {
           typeBadgeColor = 'bg-purple-100 text-purple-800';
@@ -3265,13 +3646,29 @@
               </div>
               <div class="mt-0.5">${syncBadge}</div>
             </div>
-            <button class="delete-btn touch-btn w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition" data-id="${t.id}" title="Hapus Transaksi">
-              <i class="fa-regular fa-trash-can text-xs"></i>
-            </button>
+            <div class="flex items-center gap-1">
+              <button class="edit-btn touch-btn w-8 h-8 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 flex items-center justify-center transition" data-id="${t.id}" title="Edit Transaksi">
+                <i class="fa-regular fa-pen-to-square text-xs"></i>
+              </button>
+              <button class="delete-btn touch-btn w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition" data-id="${t.id}" title="Hapus Transaksi">
+                <i class="fa-regular fa-trash-can text-xs"></i>
+              </button>
+            </div>
           </div>
         `;
 
-        listEl.appendChild(item);
+          itemsWrapper.appendChild(item);
+        });
+
+        groupContainer.appendChild(itemsWrapper);
+        listEl.appendChild(groupContainer);
+      });
+
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          openEditTransactionModal(id);
+        });
       });
 
       document.querySelectorAll('.delete-btn').forEach(btn => {
@@ -3283,6 +3680,236 @@
     }
 
     // --- Modal Confirmation for Transaction Delete ---
+    
+    // --- EDIT TRANSAKSI LOGIC (WITH AUTOMATIC BALANCE & DEBT RECALCULATION) ---
+    let transactionUnderEdit = null;
+
+    function openEditTransactionModal(txId) {
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+      transactionUnderEdit = tx;
+
+      const modal = document.getElementById('modal-edit-tx-container');
+      const idInput = document.getElementById('edit-tx-id');
+      const amtInput = document.getElementById('edit-tx-amount');
+      const amtPreview = document.getElementById('edit-tx-amount-preview');
+      const dateInput = document.getElementById('edit-tx-date');
+      const noteInput = document.getElementById('edit-tx-note');
+      const typeBadge = document.getElementById('edit-tx-type-badge');
+      const walletSelect = document.getElementById('edit-tx-select-wallet');
+      const catSelect = document.getElementById('edit-tx-select-category');
+      const subSelect = document.getElementById('edit-tx-select-subcategory');
+      const catContainer = document.getElementById('container-edit-tx-categories');
+      const walletContainer = document.getElementById('container-edit-tx-wallet');
+
+      if (!modal) return;
+
+      idInput.value = tx.id;
+      amtInput.value = (Number(tx.amount) || 0).toLocaleString('id-ID');
+      amtPreview.textContent = formatRupiah(tx.amount);
+      dateInput.value = tx.date || new Date().toISOString().split('T')[0];
+      noteInput.value = tx.note || '';
+
+      if (typeBadge) {
+        typeBadge.textContent = `Jenis: ${tx.type} • ID: ${tx.id.substring(0, 8)}`;
+      }
+
+      // Populate Wallets
+      if (walletSelect) {
+        walletSelect.innerHTML = '';
+        wallets.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w.id;
+          opt.textContent = `${w.name} (${w.type}) - ${formatRupiah(w.balance)}`;
+          walletSelect.appendChild(opt);
+        });
+        if (tx.walletId && wallets.some(w => w.id === tx.walletId)) {
+          walletSelect.value = tx.walletId;
+        } else {
+          const foundByName = wallets.find(w => w.name === tx.wallet);
+          if (foundByName) walletSelect.value = foundByName.id;
+        }
+      }
+
+      // Populate Categories & Subcategories
+      if (tx.type === 'Transfer') {
+        if (catContainer) catContainer.classList.add('hidden');
+        if (walletContainer) walletContainer.classList.add('hidden');
+      } else {
+        if (catContainer) catContainer.classList.remove('hidden');
+        if (walletContainer) walletContainer.classList.remove('hidden');
+
+        const typeCats = categories[tx.type] || {};
+        const catKeys = Object.keys(typeCats);
+
+        if (catSelect) {
+          catSelect.innerHTML = '';
+          catKeys.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = cat;
+            catSelect.appendChild(opt);
+          });
+          if (tx.category && catKeys.includes(tx.category)) {
+            catSelect.value = tx.category;
+          } else if (catKeys.length > 0) {
+            catSelect.value = catKeys[0];
+          }
+        }
+
+        updateEditTxSubcategories(tx.subcategory);
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function updateEditTxSubcategories(presetSub = null) {
+      if (!transactionUnderEdit) return;
+      const catSelect = document.getElementById('edit-tx-select-category');
+      const subSelect = document.getElementById('edit-tx-select-subcategory');
+      if (!catSelect || !subSelect) return;
+
+      const selCat = catSelect.value;
+      const subs = (categories[transactionUnderEdit.type] && categories[transactionUnderEdit.type][selCat]) || [];
+
+      subSelect.innerHTML = '';
+      subs.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        subSelect.appendChild(opt);
+      });
+
+      if (presetSub && subs.includes(presetSub)) {
+        subSelect.value = presetSub;
+      } else if (subs.length > 0) {
+        subSelect.value = subs[0];
+      }
+    }
+
+    function closeEditTransactionModal() {
+      transactionUnderEdit = null;
+      const modal = document.getElementById('modal-edit-tx-container');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function saveEditedTransaction() {
+      if (!transactionUnderEdit) return;
+      const oldTx = transactionUnderEdit;
+
+      const amtInput = document.getElementById('edit-tx-amount');
+      const dateInput = document.getElementById('edit-tx-date');
+      const noteInput = document.getElementById('edit-tx-note');
+      const walletSelect = document.getElementById('edit-tx-select-wallet');
+      const catSelect = document.getElementById('edit-tx-select-category');
+      const subSelect = document.getElementById('edit-tx-select-subcategory');
+
+      const newAmount = cleanNumber(amtInput.value);
+      if (newAmount <= 0) {
+        showToast("Nominal transaksi harus lebih dari 0!", "error");
+        amtInput.focus();
+        return;
+      }
+
+      const newDate = dateInput.value || oldTx.date;
+      const newNote = noteInput.value.trim();
+
+      // 1. ROLLBACK THE OLD TRANSACTION IMPACT FIRST
+      const oldAmt = Number(oldTx.amount) || 0;
+      const oldStatus = getTxPaylaterStatus(oldTx);
+      const wasPLDebt = oldStatus === 'DEBT';
+      const wasPLPay = oldStatus === 'PAYMENT';
+
+      if (wasPLDebt) {
+        // Paylater debt did not deduct liquid wallet, so no liquid refund
+      } else if (wasPLPay) {
+        // Paylater payment refunded to paying wallet
+        const wOld = wallets.find(x => x.id === oldTx.walletId || x.name === oldTx.wallet);
+        if (wOld) wOld.balance = (Number(wOld.balance) || 0) + oldAmt;
+      } else if (oldTx.type === 'Transfer') {
+        const fromW = wallets.find(x => x.id === oldTx.fromWalletId);
+        const toW = wallets.find(x => x.id === oldTx.toWalletId);
+        const fee = Number(oldTx.adminFee) || 0;
+        if (fromW) fromW.balance += (oldAmt + fee);
+        if (toW) toW.balance -= oldAmt;
+      } else {
+        const wOld = wallets.find(x => x.id === oldTx.walletId || x.name === oldTx.wallet);
+        if (wOld) {
+          if (oldTx.type === 'Pengeluaran' || oldTx.type === 'Cicilan' || oldTx.type === 'Investasi') {
+            wOld.balance = (Number(wOld.balance) || 0) + oldAmt;
+          } else if (oldTx.type === 'Pemasukan') {
+            wOld.balance = (Number(wOld.balance) || 0) - oldAmt;
+          }
+        }
+      }
+
+      // 2. APPLY THE NEW TRANSACTION VALUES & BALANCE IMPACT
+      if (oldTx.type === 'Transfer') {
+        // For transfer, only amount, date, and note change
+        oldTx.amount = newAmount;
+        oldTx.date = newDate;
+        oldTx.note = newNote;
+        
+        const fromW = wallets.find(x => x.id === oldTx.fromWalletId);
+        const toW = wallets.find(x => x.id === oldTx.toWalletId);
+        const fee = Number(oldTx.adminFee) || 0;
+        if (fromW) fromW.balance -= (newAmount + fee);
+        if (toW) toW.balance += newAmount;
+      } else {
+        const newCat = catSelect ? catSelect.value : oldTx.category;
+        const newSub = subSelect ? subSelect.value : oldTx.subcategory;
+        const newWalletId = walletSelect ? walletSelect.value : oldTx.walletId;
+        const targetWallet = wallets.find(w => w.id === newWalletId) || wallets[0];
+
+        oldTx.amount = newAmount;
+        oldTx.date = newDate;
+        oldTx.note = newNote;
+        oldTx.category = newCat;
+        oldTx.subcategory = newSub;
+        oldTx.walletId = targetWallet ? targetWallet.id : oldTx.walletId;
+        oldTx.wallet = targetWallet ? targetWallet.name : oldTx.wallet;
+
+        const isNowPLPay = isPaylaterPaymentTx(oldTx.type, newCat, newSub, oldTx);
+        const isNowPLDebt = !isNowPLPay && (oldTx.type === 'Cicilan' || isPaylaterDebtTx(oldTx.type, newCat, newSub, oldTx));
+
+        oldTx.isPaylaterDebt = isNowPLDebt;
+        oldTx.isPaylaterPayment = isNowPLPay;
+
+        if (isNowPLDebt) {
+          const dueInfo = calculateDueDate(newDate, newSub || newCat);
+          oldTx.dueDate = dueInfo.dueDate;
+        } else if (isNowPLPay) {
+          if (targetWallet) targetWallet.balance = (Number(targetWallet.balance) || 0) - newAmount;
+        } else {
+          if (targetWallet) {
+            if (oldTx.type === 'Pengeluaran' || oldTx.type === 'Cicilan' || oldTx.type === 'Investasi') {
+              targetWallet.balance = (Number(targetWallet.balance) || 0) - newAmount;
+            } else if (oldTx.type === 'Pemasukan') {
+              targetWallet.balance = (Number(targetWallet.balance) || 0) + newAmount;
+            }
+          }
+        }
+      }
+
+      // Mark as pending re-sync so Sheets sync can update
+      oldTx.synced = false;
+
+      saveWallets();
+      saveTransactions();
+      updateDashboard();
+      renderHistory();
+      renderPaylaterMonitor();
+
+      // Sync updated doc to Firebase if connected
+      if (isFirebaseConnected && db) {
+        syncTxToFirebase(oldTx);
+        syncWalletsToFirebase();
+      }
+
+      closeEditTransactionModal();
+      showToast("Perubahan transaksi berhasil disimpan!", "success");
+    }
+
     function openDeleteModal(id) {
       transactionToDeleteId = id;
       document.getElementById('modal-container').classList.remove('hidden');
@@ -3294,6 +3921,267 @@
     }
 
     // --- Render Wealth Growth Monitoring & Analysis ---
+    
+    // --- PAYLATER MONITOR & PAYMENT MODAL LOGIC ---
+    function renderPaylaterMonitor() {
+      const listEl = document.getElementById('paylater-transaction-list');
+      const emptyEl = document.getElementById('empty-paylater-history');
+      const filterProv = document.getElementById('filter-paylater-provider') ? document.getElementById('filter-paylater-provider').value : 'ALL';
+
+      let totalPaylaterDebt = 0;
+      let kredivoDebt = 0, kredivoCount = 0;
+      let shopeeDebt = 0, shopeeCount = 0;
+      let yupDebt = 0, yupCount = 0;
+
+      // Filter all paylater transactions (both debt creation and payments)
+      const paylaterTxs = transactions.filter(t => {
+        return getTxPaylaterStatus(t) !== 'NONE';
+      });
+
+      // Calculate debt per provider accurately
+      transactions.forEach(t => {
+        const amt = Number(t.amount) || 0;
+        const sub = (t.subcategory || '').toLowerCase();
+        const cat = (t.category || '').toLowerCase();
+        const note = (t.note || '').toLowerCase();
+        const text = sub + ' ' + cat + ' ' + note;
+        const status = getTxPaylaterStatus(t);
+
+        if (status === 'DEBT') {
+          totalPaylaterDebt += amt;
+          if (text.includes('kredivo')) {
+            kredivoDebt += amt;
+            kredivoCount++;
+          } else if (text.includes('shopee') || text.includes('spaylater')) {
+            shopeeDebt += amt;
+            shopeeCount++;
+          } else if (text.includes('yup')) {
+            yupDebt += amt;
+            yupCount++;
+          }
+        } else if (status === 'PAYMENT') {
+          totalPaylaterDebt -= amt;
+          if (text.includes('kredivo')) {
+            kredivoDebt -= amt;
+          } else if (text.includes('shopee') || text.includes('spaylater')) {
+            shopeeDebt -= amt;
+          } else if (text.includes('yup')) {
+            yupDebt -= amt;
+          } else {
+            // Pelunasan umum/lainnya: kurangi dari provider yang masih memiliki hutang berjalan
+            let rem = amt;
+            if (kredivoDebt > 0 && rem > 0) {
+              const deduct = Math.min(kredivoDebt, rem);
+              kredivoDebt -= deduct;
+              rem -= deduct;
+            }
+            if (shopeeDebt > 0 && rem > 0) {
+              const deduct = Math.min(shopeeDebt, rem);
+              shopeeDebt -= deduct;
+              rem -= deduct;
+            }
+            if (yupDebt > 0 && rem > 0) {
+              const deduct = Math.min(yupDebt, rem);
+              yupDebt -= deduct;
+              rem -= deduct;
+            }
+          }
+        }
+      });
+
+      totalPaylaterDebt = Math.max(0, totalPaylaterDebt);
+      kredivoDebt = Math.max(0, kredivoDebt);
+      shopeeDebt = Math.max(0, shopeeDebt);
+      yupDebt = Math.max(0, yupDebt);
+
+      // Update Monitor Cards
+      const totalEl = document.getElementById('monitor-total-debt-val');
+      const kredivoEl = document.getElementById('monitor-kredivo-debt');
+      const shopeeEl = document.getElementById('monitor-shopee-debt');
+      const yupEl = document.getElementById('monitor-yup-debt');
+      const kredivoCntEl = document.getElementById('monitor-kredivo-count');
+      const shopeeCntEl = document.getElementById('monitor-shopee-count');
+      const yupCntEl = document.getElementById('monitor-yup-count');
+
+      if (totalEl) totalEl.textContent = formatRupiah(totalPaylaterDebt);
+      if (kredivoEl) kredivoEl.textContent = formatRupiah(kredivoDebt);
+      if (shopeeEl) shopeeEl.textContent = formatRupiah(shopeeDebt);
+      if (yupEl) yupEl.textContent = formatRupiah(yupDebt);
+      if (kredivoCntEl) kredivoCntEl.textContent = kredivoDebt > 0 ? `${formatRupiah(kredivoDebt)} belum lunas` : 'Lunas';
+      if (shopeeCntEl) shopeeCntEl.textContent = shopeeDebt > 0 ? `${formatRupiah(shopeeDebt)} belum lunas` : 'Lunas';
+      if (yupCntEl) yupCntEl.textContent = yupDebt > 0 ? `${formatRupiah(yupDebt)} belum lunas` : 'Lunas';
+
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      const filtered = paylaterTxs.filter(t => {
+        if (filterProv === 'ALL') return true;
+        const text = (t.subcategory + ' ' + t.category + ' ' + (t.note || '')).toLowerCase();
+        return text.includes(filterProv);
+      });
+
+      if (filtered.length === 0) {
+        if (emptyEl) emptyEl.classList.remove('hidden');
+        return;
+      }
+      if (emptyEl) emptyEl.classList.add('hidden');
+
+      const sorted = [...filtered].sort((a, b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
+
+      sorted.forEach(t => {
+        const status = getTxPaylaterStatus(t);
+        const isDebt = status === 'DEBT';
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-xl border border-slate-200 bg-white hover:border-purple-300 transition flex items-center justify-between shadow-xs';
+
+        const logoHtml = getWalletLogoHtml(t.subcategory || t.category, 'Paylater', 'sm');
+        const dueInfo = calculateDueDate(t.date, t.subcategory || t.category);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl ${isDebt ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'} flex items-center justify-center text-sm shrink-0">
+              <i class="fa-solid ${isDebt ? 'fa-credit-card' : 'fa-receipt'}"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-slate-900 text-xs sm:text-sm">${t.subcategory || t.category}</span>
+                ${isDebt ? `<span class="text-[10px] bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded font-bold">${dueInfo.ruleText}: ${formatShortDate(t.dueDate || dueInfo.dueDate)}</span>` : '<span class="text-[10px] bg-emerald-100 text-emerald-900 px-1.5 py-0.2 rounded font-bold">Pelunasan Paylater</span>'}
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
+                <span>Tgl: ${formatShortDate(t.date)}</span>
+                <span>•</span>
+                <span>${t.wallet}</span>
+                ${t.note ? `<span>•</span> <span class="italic text-slate-600">${t.note}</span>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="text-right flex items-center gap-3 shrink-0 ml-2">
+            <div>
+              <div class="text-xs sm:text-sm font-black ${isDebt ? 'text-purple-700' : 'text-emerald-700'}">
+                ${isDebt ? '⏱ ' : '- '}${formatRupiah(t.amount)}
+              </div>
+              <span class="text-[10px] text-slate-400 block">${isDebt ? 'Hutang baru' : 'Pelunasan tagihan'}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="edit-btn touch-btn w-7 h-7 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 flex items-center justify-center transition" data-id="${t.id}" title="Edit Transaksi">
+                <i class="fa-regular fa-pen-to-square text-xs"></i>
+              </button>
+              <button class="delete-btn touch-btn w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition" data-id="${t.id}" title="Hapus Transaksi">
+                <i class="fa-regular fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+
+      // Bind edit and delete listeners in paylater tab
+      listEl.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          openEditTransactionModal(e.currentTarget.getAttribute('data-id'));
+        });
+      });
+      listEl.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          openDeleteModal(e.currentTarget.getAttribute('data-id'));
+        });
+      });
+    }
+
+    function openPaylaterPaymentModal() {
+      const modal = document.getElementById('modal-paylater-payment-container');
+      const walletSelect = document.getElementById('pay-paylater-wallet');
+      const amtInput = document.getElementById('pay-paylater-amount');
+      const amtPreview = document.getElementById('pay-paylater-amount-preview');
+      const dateInput = document.getElementById('pay-paylater-date');
+      const noteInput = document.getElementById('pay-paylater-note');
+      if (!modal) return;
+
+      if (amtInput) amtInput.value = '';
+      if (amtPreview) amtPreview.textContent = 'Rp 0';
+      if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+      if (noteInput) noteInput.value = '';
+
+      // Populate paying wallets (exclude paylater accounts)
+      if (walletSelect) {
+        walletSelect.innerHTML = '';
+        wallets.filter(w => w.type !== 'Paylater').forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w.id;
+          opt.textContent = `${w.name} (${w.type}) - ${formatRupiah(w.balance)}`;
+          walletSelect.appendChild(opt);
+        });
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closePaylaterPaymentModal() {
+      const modal = document.getElementById('modal-paylater-payment-container');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function submitPaylaterPayment() {
+      const providerSelect = document.getElementById('pay-paylater-provider');
+      const amtInput = document.getElementById('pay-paylater-amount');
+      const walletSelect = document.getElementById('pay-paylater-wallet');
+      const dateInput = document.getElementById('pay-paylater-date');
+      const noteInput = document.getElementById('pay-paylater-note');
+
+      const amount = cleanNumber(amtInput.value);
+      if (amount <= 0) {
+        showToast("Nominal pembayaran harus lebih dari 0!", "error");
+        amtInput.focus();
+        return;
+      }
+
+      const walletId = walletSelect ? walletSelect.value : '';
+      const targetWallet = wallets.find(w => w.id === walletId) || wallets[0];
+      if (!targetWallet) {
+        showToast("Pilih dompet pembayaran yang valid!", "error");
+        return;
+      }
+
+      const subcategory = providerSelect ? providerSelect.value : 'Bayar Paylater';
+      const date = dateInput.value || new Date().toISOString().split('T')[0];
+      const note = noteInput.value.trim() || `Pelunasan tagihan ${subcategory}`;
+
+      // Deduct paying wallet balance
+      targetWallet.balance = (Number(targetWallet.balance) || 0) - amount;
+
+      const newTx = {
+        id: 'tx-pay-pl-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        date: date,
+        type: 'Pengeluaran',
+        category: 'Pinjaman & Paylater',
+        subcategory: subcategory,
+        amount: amount,
+        walletId: targetWallet.id,
+        wallet: targetWallet.name,
+        isPaylaterPayment: true,
+        note: note,
+        synced: false
+      };
+
+      transactions.unshift(newTx);
+      saveTransactions();
+      saveWallets();
+      updateDashboard();
+      renderHistory();
+      renderPaylaterMonitor();
+
+      if (isFirebaseConnected && db) {
+        syncTxToFirebase(newTx);
+        syncWalletsToFirebase();
+      }
+
+      closePaylaterPaymentModal();
+      const sisaHutang = getAccumulatedPaylaterDebt();
+      showToast(`Pembayaran ${subcategory} ${formatRupiah(amount)} sukses dicatat sebagai Pengeluaran! Sisa hutang: ${formatRupiah(sisaHutang)}`, "success");
+    }
+
     function renderWealthAnalytics() {
       // Calculate current live balances
       let liveCash = 0;
@@ -3766,6 +4654,7 @@
       if (targetId === 'tab-history') renderHistory();
       if (targetId === 'tab-wallets') renderWalletCards();
       if (targetId === 'tab-categories') renderCategoryManager();
+      if (targetId === 'tab-paylater') renderPaylaterMonitor();
     }
 
     // --- DOM Initializer ---
@@ -4162,10 +5051,49 @@
           return;
         }
 
-        const isPaylaterDebt = isPaylaterDebtTx(currentType, category, subcategory);
         const isPaylaterPayment = isPaylaterPaymentTx(currentType, category, subcategory);
+        const isPaylaterDebt = isPaylaterDebtTx(currentType, category, subcategory);
 
-        // ATURAN 1: Semua transaksi dari menu Cicilan/Hutang diakumulasikan ke Paylater/Hutang & tidak mengurangi saldo kas bulan berjalan
+        // ATURAN 1: Pengeluaran untuk Pelunasan/Bayar Paylater memotong saldo dompet & MENGURANGI akumulasi hutang
+        if (isPaylaterPayment) {
+          targetWallet.balance = (Number(targetWallet.balance) || 0) - amount;
+
+          const newTx = {
+            id: 'tx-pay-pl-' + Date.now(),
+            timestamp: new Date().toISOString(),
+            date: date,
+            type: 'Pengeluaran',
+            category: category,
+            subcategory: subcategory,
+            amount: amount,
+            walletId: targetWallet.id,
+            wallet: targetWallet.name,
+            isPaylaterPayment: true,
+            note: note || `Pembayaran Tagihan ${subcategory || 'Paylater'}`,
+            synced: false
+          };
+
+          transactions.unshift(newTx);
+          saveTransactions();
+          saveWallets();
+          updateDashboard();
+          renderHistory();
+          renderPaylaterMonitor();
+
+          amtInput.value = '';
+          amtPreview.textContent = 'Rp 0';
+          document.getElementById('input-note').value = '';
+
+          const sisaHutang = getAccumulatedPaylaterDebt();
+          if (syncImmediately) {
+            syncToSheets([newTx]);
+          } else {
+            showToast(`Pelunasan ${subcategory || 'Paylater'} ${formatRupiah(amount)} dicatat! Saldo ${targetWallet.name} berkurang & sisa hutang: ${formatRupiah(sisaHutang)}`, "success");
+          }
+          return;
+        }
+
+        // ATURAN 2: Transaksi Cicilan/Hutang baru diakumulasikan ke Paylater/Hutang & tidak mengurangi saldo kas bulan berjalan
         if (currentType === 'Cicilan' || isPaylaterDebt) {
           const dueInfo = calculateDueDate(date, subcategory || category);
           const dueDate = dueInfo.dueDate;
@@ -4191,6 +5119,8 @@
           saveTransactions();
           saveWallets();
           updateDashboard();
+          renderHistory();
+          renderPaylaterMonitor();
 
           amtInput.value = '';
           amtPreview.textContent = 'Rp 0';
@@ -4201,43 +5131,6 @@
             syncToSheets([newTx]);
           } else {
             showToast(`Transaksi Cicilan/Hutang ${formatRupiah(amount)} dicatat! Total hutang kini ${formatRupiah(totalHutang)} (Jatuh tempo: ${formatShortDate(dueDate)})`, "success");
-          }
-          return;
-        }
-
-        // ATURAN 2: Pengeluaran subkategori Bayar Paylater memotong saldo dompet pembayar & mengurangi akumulasi hutang
-        if (isPaylaterPayment) {
-          targetWallet.balance = (Number(targetWallet.balance) || 0) - amount;
-
-          const newTx = {
-            id: 'tx-pay-pl-' + Date.now(),
-            timestamp: new Date().toISOString(),
-            date: date,
-            type: 'Pengeluaran',
-            category: category,
-            subcategory: subcategory,
-            amount: amount,
-            walletId: targetWallet.id,
-            wallet: targetWallet.name,
-            isPaylaterPayment: true,
-            note: note || 'Pembayaran Tagihan Paylater',
-            synced: false
-          };
-
-          transactions.unshift(newTx);
-          saveTransactions();
-          saveWallets();
-          updateDashboard();
-
-          amtInput.value = '';
-          amtPreview.textContent = 'Rp 0';
-          document.getElementById('input-note').value = '';
-
-          const sisaHutang = getAccumulatedPaylaterDebt();
-          if (syncImmediately) {
-            syncToSheets([newTx]);
-          } else {
-            showToast(`Bayar Paylater ${formatRupiah(amount)} sukses! Saldo ${targetWallet.name} terpotong & sisa hutang kini ${formatRupiah(sisaHutang)}`, "success");
           }
           return;
         }
@@ -4294,8 +5187,9 @@
           if (tx) {
             // Rollback wallet balance
             const amt = Number(tx.amount) || 0;
-            const isPLDebt = tx.isPaylaterDebt || isPaylaterDebtTx(tx.type, tx.category, tx.subcategory);
-            const isPLPay = tx.isPaylaterPayment || isPaylaterPaymentTx(tx.type, tx.category, tx.subcategory);
+            const status = getTxPaylaterStatus(tx);
+            const isPLDebt = status === 'DEBT';
+            const isPLPay = status === 'PAYMENT';
 
             if (isPLDebt) {
               // Hutang paylater: saat dicatat tidak memotong saldo kas/bank, jadi saat dihapus tidak menambah saldo kas/bank
@@ -4329,6 +5223,7 @@
             saveTransactions();
             updateDashboard();
             renderHistory();
+            renderPaylaterMonitor();
             showToast("Transaksi dihapus dan saldo dompet telah di-rollback.", "info");
           }
         }
@@ -4633,7 +5528,91 @@
         });
       }
 
+      // Paylater Modal & Monitor Listeners
+      const btnOpenPayPaylater = document.getElementById('btn-open-paylater-payment-modal');
+      const btnClosePayPaylater = document.getElementById('btn-close-paylater-payment');
+      const btnCancelPayPaylater = document.getElementById('btn-cancel-paylater-payment');
+      const btnSubmitPayPaylater = document.getElementById('btn-submit-paylater-payment');
+      const payAmtInput = document.getElementById('pay-paylater-amount');
+      const payAmtPreview = document.getElementById('pay-paylater-amount-preview');
+      const btnPayAllDebt = document.getElementById('btn-pay-all-debt');
+      const filterPaylaterProv = document.getElementById('filter-paylater-provider');
+      const badgeDebtClick = document.getElementById('badge-debt-container');
+
+      if (badgeDebtClick) {
+        badgeDebtClick.addEventListener('click', () => switchTab('tab-paylater'));
+      }
+
+      if (btnOpenPayPaylater) {
+        btnOpenPayPaylater.addEventListener('click', openPaylaterPaymentModal);
+      }
+      if (btnClosePayPaylater) {
+        btnClosePayPaylater.addEventListener('click', closePaylaterPaymentModal);
+      }
+      if (btnCancelPayPaylater) {
+        btnCancelPayPaylater.addEventListener('click', closePaylaterPaymentModal);
+      }
+      if (btnSubmitPayPaylater) {
+        btnSubmitPayPaylater.addEventListener('click', submitPaylaterPayment);
+      }
+
+      if (payAmtInput && payAmtPreview) {
+        payAmtInput.addEventListener('input', () => {
+          const num = cleanNumber(payAmtInput.value);
+          payAmtInput.value = num > 0 ? num.toLocaleString('id-ID') : '';
+          payAmtPreview.textContent = formatRupiah(num);
+        });
+
+        document.querySelectorAll('.btn-quick-pay-amt').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const add = parseInt(btn.getAttribute('data-amt'), 10) || 0;
+            const cur = cleanNumber(payAmtInput.value);
+            const next = cur + add;
+            payAmtInput.value = next > 0 ? next.toLocaleString('id-ID') : '';
+            payAmtPreview.textContent = formatRupiah(next);
+          });
+        });
+
+        if (btnPayAllDebt) {
+          btnPayAllDebt.addEventListener('click', () => {
+            const allDebt = getAccumulatedPaylaterDebt();
+            payAmtInput.value = allDebt > 0 ? allDebt.toLocaleString('id-ID') : '';
+            payAmtPreview.textContent = formatRupiah(allDebt);
+          });
+        }
+      }
+
+      if (filterPaylaterProv) {
+        filterPaylaterProv.addEventListener('change', renderPaylaterMonitor);
+      }
+
       // Factory Reset Modal Listeners
+            // Edit Transaction Modal Listeners
+      const btnCloseEditTx = document.getElementById('btn-close-edit-tx');
+      const btnCancelEditTx = document.getElementById('btn-cancel-edit-tx');
+      const btnSaveEditTx = document.getElementById('btn-save-edit-tx');
+      const editTxAmtInput = document.getElementById('edit-tx-amount');
+      const editTxAmtPreview = document.getElementById('edit-tx-amount-preview');
+      const editTxCatSelect = document.getElementById('edit-tx-select-category');
+
+      if (btnCloseEditTx) btnCloseEditTx.addEventListener('click', closeEditTransactionModal);
+      if (btnCancelEditTx) btnCancelEditTx.addEventListener('click', closeEditTransactionModal);
+      if (btnSaveEditTx) btnSaveEditTx.addEventListener('click', saveEditedTransaction);
+
+      if (editTxAmtInput && editTxAmtPreview) {
+        editTxAmtInput.addEventListener('input', () => {
+          const num = cleanNumber(editTxAmtInput.value);
+          editTxAmtInput.value = num > 0 ? num.toLocaleString('id-ID') : '';
+          editTxAmtPreview.textContent = formatRupiah(num);
+        });
+      }
+
+      if (editTxCatSelect) {
+        editTxCatSelect.addEventListener('change', () => {
+          updateEditTxSubcategories();
+        });
+      }
+
       const btnOpenFactoryReset = document.getElementById('btn-open-factory-reset-modal');
       const btnCancelFactoryReset = document.getElementById('btn-cancel-factory-reset');
       const btnConfirmFactoryReset = document.getElementById('btn-confirm-factory-reset');
